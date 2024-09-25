@@ -3,8 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
-  layers:
+  tags:
+  - GamePiece
   - Default
   - TransparentFX
   - Ignore Raycast
