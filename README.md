@@ -10,7 +10,7 @@
 
 ## Authors
   Elliott Hager
-  Vince
+  Vince Cavallaro
 
 ## Tech Stack & Credits to 3rd Party Assets and Libraries
   * Unity
