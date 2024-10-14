@@ -1,0 +1,76 @@
+{
+    "name": "Movement",
+    "maps": [
+        {
+            "name": "KeyBoard",
+            "id": "b4dfc00b-5a78-403a-87ae-efa83d36093c",
+            "actions": [
+                {
+                    "name": "SoftDrop",
+                    "type": "Button",
+                    "id": "08d3b0a5-3d68-438f-b3a4-43786aca4eb6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftRightMovement",
+                    "type": "Button",
+                    "id": "ff43a015-592e-4a44-8f2f-e1df77b276c3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d9538910-9312-4f02-bdb4-08d6818eb7ba",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SoftDrop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "fb7dd4e5-2d77-4d8e-9b69-8b4ffc851d49",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftRightMovement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "ae2c8c88-4247-4ff8-b39f-7876baf7747e",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftRightMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "ad2d580d-7167-4117-bc07-7648a6b9e895",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftRightMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
