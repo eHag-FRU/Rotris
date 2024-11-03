@@ -8,10 +8,10 @@ public class BackBoardPiece : MonoBehaviour
     // Start is called before the first frame update
 
 
-    [Range(0,9)]
+    [Range(0,19)]
     public int vectorRowIndex;
 
-    [Range(0,19)]
+    [Range(0,9)]
     public int vectorColumnIndex;
 
 

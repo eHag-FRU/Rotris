@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
@@ -80,7 +81,7 @@ public class Piece_Backup : MonoBehaviour {
         //currentPiece.position = new UnityEngine.Vector2(currentPiece.position.x + movement, currentPiece.position.y);
 
         if (pieceMovement.triggered) {
-            currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>(),
+            currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>() * 2,
                 currentPiece.position.y);
         }
 
@@ -94,7 +95,7 @@ public class Piece_Backup : MonoBehaviour {
         //Soft Drop
         if (softDrop.triggered) {
             //Move the piece down by one
-            this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 1, this.transform.position.z );
+            this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
            
         }
 
@@ -115,7 +116,7 @@ public class Piece_Backup : MonoBehaviour {
 
     void Step(){
         print("Making a step");
-        this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 1, this.transform.position.z );
+        this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
 
         CancelInvoke("Step");   
     }
