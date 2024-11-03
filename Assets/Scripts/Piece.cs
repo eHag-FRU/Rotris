@@ -23,12 +23,17 @@ public class Piece_Backup : MonoBehaviour {
     public PlayerInput playerInput; 
 
     //Input actions
-    private InputAction pieceMovement;
+    public InputAction pieceMovement;
     private InputAction pieceRotation;
     private InputAction boardRotation;
     private InputAction softDrop;
     private InputAction hardDrop;
     private InputAction hold;
+
+
+    //Used for DEBUGGING
+    [SerializeField]
+    private bool stepEnabled = false;
 
     // Start is called before the first frame update
     void Start()
@@ -102,8 +107,11 @@ public class Piece_Backup : MonoBehaviour {
             
         // }
 
-        Invoke("Step", 1F);
-    }
+        if (stepEnabled) {
+            Invoke("Step", 1F);
+        }
+        
+    } 
 
     void Step(){
         print("Making a step");

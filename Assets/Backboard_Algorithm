@@ -1,0 +1,10 @@
+Tag all pieces with the BackGroundPiece tag
+Give each piece an index number, starting at 0
+Pull each backboard piece during update    ===> This should give us the actual vector of the board
+
+
+ 0 = No piece present
+ 1 = piece present
+
+
+ Use BackBoardPiece.CS for the reference for the way the back board

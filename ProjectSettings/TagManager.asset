@@ -10,6 +10,10 @@ TagManager:
   - Ignore Raycast
   - Water
   - UI
+  - TestPiece
+  - Piece
+  - Boarder
+  - Backboard_Piece
   layers:
   - Default
   - TransparentFX
@@ -46,4 +50,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background Pieces
+    uniqueID: 1567492647
+    locked: 0
+  - name: Pieces
+    uniqueID: 300565713
+    locked: 0
+  - name: Border
+    uniqueID: 1149004683
     locked: 0
