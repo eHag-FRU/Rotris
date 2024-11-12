@@ -35,16 +35,18 @@ public class BackBoardPiece : MonoBehaviour
     }
 
     public void OnTriggerEnter2D(Collider2D other) {
+        //print($"ENTERING {this.name.ToUpper()}'s TRIGGER!!!!");
         //Check if the other is a piece tag
-        if (other.tag == "Piece") {
+        if (other.tag == "Piece_Part") {
             //the piece is there, now signal there is a piece there
+            //print($"{other.name.ToUpper()}'S TAG IS Piece");
             piecePresent = 1;
             return;
         }
     }
 
     public void OnTriggerExit2D(Collider2D other) {
-        print($"LEAVING {this.name.ToUpper()}'S TRIGGER!!!!");
+        //print($"LEAVING {this.name.ToUpper()}'S TRIGGER!!!!");
 
         //Check if the other is a piece tag
         //if (other.tag == "Piece") {
@@ -56,7 +58,7 @@ public class BackBoardPiece : MonoBehaviour
 
     public static int getVectorRowIndex(BackBoardPiece piece) {
 
-        if (piece.tag == "TestPiece") {
+        if (piece.tag == "TestPiece" || piece.tag == "Backboard_Piece") {
             return piece.vectorRowIndex;
 
         }
@@ -67,7 +69,7 @@ public class BackBoardPiece : MonoBehaviour
     public static int getVectorColumnIndex(BackBoardPiece piece) {
 
 
-        if (piece.tag == "TestPiece") {
+        if (piece.tag == "TestPiece" || piece.tag == "Backboard_Piece") {
            return piece.vectorColumnIndex;
 
         }

@@ -25,6 +25,8 @@ public class DEBUG_VectorBoardPrint : MonoBehaviour
 
     void updateBoardText() {
 
+        print("UPDATING BOARD TEXT!!!");
+
         //Now set the text
         boardTextHolder.text = Board.printBoardVectorState();
 

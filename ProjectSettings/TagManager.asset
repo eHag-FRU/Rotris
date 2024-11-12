@@ -14,6 +14,8 @@ TagManager:
   - Piece
   - Boarder
   - Backboard_Piece
+  - BoardBottom
+  - Piece_Part
   layers:
   - Default
   - TransparentFX
