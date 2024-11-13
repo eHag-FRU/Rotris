@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -44,6 +45,18 @@ public class Piece_Backup : MonoBehaviour {
     //Used for DEBUGGING
     [SerializeField]
     private bool stepEnabled = false;
+
+
+    //Piece enum to hold the names
+    enum pieceNames {
+        I,
+        T,
+        O,
+        S,
+        Z,
+        J,
+        L
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -94,7 +107,7 @@ public class Piece_Backup : MonoBehaviour {
         }
 
         //Sorts the part locations so the largest is on the bottom and the last location checked
-        PiecePartLocations.Sort();
+        //PiecePartLocations.Sort();
 
     }
     // Update is called once per frame
@@ -107,8 +120,13 @@ public class Piece_Backup : MonoBehaviour {
         //currentPiece.position = new UnityEngine.Vector2(currentPiece.position.x + movement, currentPiece.position.y);
 
         if (pieceMovement.triggered) {
-            currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>() * 2,
+            if (validHorizontalMoveChecker(pieceMovement.ReadValue<float>())) {
+                currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>() * 2,
                 currentPiece.position.y);
+
+                piecePartHorizontalLocationUpdater(pieceMovement.ReadValue<float>());
+            }
+            
         }
 
 
@@ -121,8 +139,15 @@ public class Piece_Backup : MonoBehaviour {
         //Soft Drop
         if (softDrop.triggered) {
             //Move the piece down by one
-            this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
-           
+
+            if (validVerticalMoveChecker()) {
+                this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
+            
+                piecePartVetricalLocationUpdater();
+
+                //Update the score by one
+                Board.updateScore(1);
+            }
         }
 
         //Check for step 
@@ -134,16 +159,118 @@ public class Piece_Backup : MonoBehaviour {
         if (stepEnabled) {
             Invoke("Step", 1F);
         }
+    } 
+
+
+    void calculateHardDrop() {
+        //Take each piece location and check the least furthest that can go down
+        //The least will be what can actually go
+        int shortestDropDistance = 0;
+
+        print("calculating hard drop distance");
+    }
+
+
+    void pickNewPiece() {
+        //Grab the enum of piece names
+        Array values = Enum.GetValues(typeof(pieceNames));
+
+        //Makes a random generator
+        System.Random randomPiecePicker = new System.Random();
+
+        //Grabs the random piece name
+        pieceNames randomPiece = (pieceNames)values.GetValue(randomPiecePicker.Next(values.Length));
+
+        print("Name of next piece picked: " + randomPiece.DisplayName());
+    }
+
+    bool validHorizontalMoveChecker(float movementDirectionModifier) {
+        print("PiecePartLocations: " + PiecePartLocations.ToString());
+
+        //Check for each piece location
+        foreach (GameObject part in PieceParts) {
+            print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().y);
+            
+            //
+            //X = Row
+            //Y = Column
+            //
+
+            int currentPartRow = part.GetComponent<PiecePart_Location>().getPartLocation().x;
+            int currentPartColl= part.GetComponent<PiecePart_Location>().getPartLocation().y;
+
+
+            //Now we have a single piece part's row and collumn
+            //Now compare against every other piece part's location
+            //Based on row + 1 (x part of the vectors) => The next position after the step
+            //This will tell us if the row right below (at same coll)
+            //Has a piece part in it OR if another block is occupying it
+            //Piece part in it => then its valid to move, as that
+            //piece part is going to move down
+
+            //NOT piece part
+            //Then invalid and start the lock timer
+            //This means its it something else!
+
+            foreach(Vector2Int partletLocation in PiecePartLocations) {
+                //If in the col + 1 is equal to one of the other pieceparts locations, break
+                //and continue cycling through
+                if (currentPartColl + movementDirectionModifier == partletLocation.y) {
+                    //We already found its new position, no need to continue, break!
+                    print("Already found new position that another partlet has");
+                    break;
+                } else if (partletLocation == PiecePartLocations[3]) {
+                    //At the last location to check!!!
+                    print(part.name + " is at last location to check " + partletLocation + " !!!!");
+                } else if (currentPartColl + movementDirectionModifier > 9 || currentPartColl + movementDirectionModifier < 0) {
+
+                    print("At Right OR Left of board!!!");
+
+                    return false;
+                }
+
+                //print (part.name + " still checking for the coll occupying " + currentPartRow + ", " + currentPartColl);
+            }
+
+            
+            
+
+           print("Done checking partlet location matches, NOT IT");
+        }
+
+
+        return true;
+    }
+
+    void piecePartHorizontalLocationUpdater(float movementDirectionModifier) {
+        //Clear the locations to allow for new
+        PiecePartLocations.Clear();
         
 
 
-       
+        //Now update the pice part locations
+        foreach (GameObject part in PieceParts) {
+            print("Horizontal Location Updater: " + movementDirectionModifier);
 
-    } 
+            //Calculate the new x and y
+            //X = Row
+            //Y = Column
+            int x = part.GetComponent<PiecePart_Location>().getPartLocation().x;
+            int y = part.GetComponent<PiecePart_Location>().getPartLocation().y + (int)movementDirectionModifier;
 
-    void Step(){
-        print("Making a step");
+            //Update them
+            part.GetComponent<PiecePart_Location>().updatePartLocation(x,y);
 
+            //Update the location in the parts location
+            PiecePartLocations.Add(part.GetComponent<PiecePart_Location>().getPartLocation());
+
+            print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
+        }
+
+    }
+
+
+    bool validVerticalMoveChecker() {
         print("PiecePartLocations: " + PiecePartLocations.ToString());
 
         //Check for each piece location
@@ -181,6 +308,16 @@ public class Piece_Backup : MonoBehaviour {
                 } else if (partletLocation == PiecePartLocations[3]) {
                     //At the last location to check!!!
                     print(part.name + " is at last location to check " + partletLocation + " !!!!");
+                } else if (currentPartRow + 1 > 19 || currentPartRow == 19) {
+                    //Piece is at bottom
+                    stepEnabled = false;
+
+                    print("At bottom of board!!!");
+
+                    //Drop piece
+                    part.transform.DetachChildren();
+
+                    return false;
                 }
 
                 //print (part.name + " still checking for the coll occupying " + currentPartRow + ", " + currentPartColl);
@@ -193,11 +330,10 @@ public class Piece_Backup : MonoBehaviour {
         }
 
 
-        //Move Piece
-        this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
+        return true;
+    }
 
-
-        
+    void piecePartVetricalLocationUpdater() {
         //Clear the locations to allow for new
         PiecePartLocations.Clear();
         
@@ -218,9 +354,26 @@ public class Piece_Backup : MonoBehaviour {
             //Update the location in the parts location
             PiecePartLocations.Add(part.GetComponent<PiecePart_Location>().getPartLocation());
 
-            print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
+            //print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
         }
 
+    }
+
+    void Step(){
+        print("Making a step");
+
+        //Check if valid for vertical
+        if (!validVerticalMoveChecker()) {
+            return;
+        }
+
+
+        //Move Piece
+        this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
+
+
+        piecePartVetricalLocationUpdater();
+        
         
         CancelInvoke("Step");   
     }

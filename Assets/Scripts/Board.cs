@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Numerics;
 using System.Text;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -36,6 +38,15 @@ public class Board : MonoBehaviour
     public static int rows = 20;
     public static int cols = 10;
 
+    public static int score = 0;
+
+    private int scoreReal = 0;
+
+
+    [SerializeField]
+    private TextMeshProUGUI scoreText;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,6 +56,12 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Update the score
+        scoreReal = score;
+
+        //Update the score text
+        updateScoreText();
+
         //Grab the piece
         GameObject[] testBackBoard = GameObject.FindGameObjectsWithTag("Backboard_Piece");
 
@@ -105,5 +122,15 @@ public class Board : MonoBehaviour
 
         //Passed the checks, so row is full
         return true;
+    }
+
+
+    public static void updateScore(int pointsToAdd) {
+        //Update the score
+        score += pointsToAdd;
+    }
+
+    private void updateScoreText() {
+        scoreText.text = scoreReal.ToString();
     }
 }
