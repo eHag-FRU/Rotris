@@ -58,6 +58,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "DEBUG_RELEAESE_PIECE",
+                    "type": "Button",
+                    "id": "50904e25-c952-41fa-9519-4a221c562680",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -146,6 +155,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Hold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1b0a8a14-5567-4113-b124-942259a89d28",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DEBUG_RELEAESE_PIECE",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

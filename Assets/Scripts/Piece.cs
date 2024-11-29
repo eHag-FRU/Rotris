@@ -33,6 +33,40 @@ public class Piece_Backup : MonoBehaviour {
     private InputAction hardDrop;
     private InputAction hold;
 
+    //
+    //  Holds the piece prefabs
+    //
+
+    [SerializeField]
+    private GameObject T;
+
+    [SerializeField]
+    private GameObject J;
+
+    [SerializeField]
+    private GameObject L;
+
+    [SerializeField]
+    private GameObject Z;
+
+    [SerializeField]
+    private GameObject I;
+
+    [SerializeField]
+    private GameObject S;
+
+    [SerializeField]
+    private GameObject O; 
+
+
+    //Holds the spawn point empty object as a location holder
+    [SerializeField]
+    private GameObject PieceSpawnPoint;
+
+
+    //REMOVE for release, used to test the piece picker functionality
+    private InputAction DEBUG_PIECE_RELEASE;
+
     //Smaller blocks that make up the piece locations
     //and gameobjects
 
@@ -86,6 +120,7 @@ public class Piece_Backup : MonoBehaviour {
         softDrop = playerInput.actions["SoftDrop"];
         hardDrop = playerInput.actions["HardDrop"];
         hold = playerInput.actions["Hold"];
+        DEBUG_PIECE_RELEASE = playerInput.actions["DEBUG_RELEAESE_PIECE"];
 
 
         //Grab the current piece to control, the piece prefab is a child to the piece object
@@ -154,6 +189,20 @@ public class Piece_Backup : MonoBehaviour {
             }
         }
 
+        //DEBUG: Force release of a piece to test spawn points
+        if (DEBUG_PIECE_RELEASE.triggered) {
+            print("DEBUG: Piece Release triggered!!");
+
+            //Detach the piece from the player controller
+            this.transform.DetachChildren();
+
+            //Set the current piece to none to remove rotations
+            this.currentPiece = null;
+
+            //Spawn a new piece onto the board
+            pickNewPiece();
+        }
+
         //Check for step 
         
        
@@ -182,10 +231,45 @@ public class Piece_Backup : MonoBehaviour {
         //Makes a random generator
         System.Random randomPiecePicker = new System.Random();
 
+        // print((pieceNames)values.GetValue());
+
         //Grabs the random piece name
+        print("Next Random Value: " + randomPiecePicker.Next(values.Length));
         pieceNames randomPiece = (pieceNames)values.GetValue(randomPiecePicker.Next(values.Length));
 
-        print("Name of next piece picked: " + randomPiece.DisplayName());
+        //DEBUG: REMOVE BEFORE RELEASE!!!!
+        randomPiece = pieceNames.L;
+
+        //print(randomPiece.DisplayName());
+        //Now get the piece prefab based oon its name
+        switch (randomPiece) {
+            case pieceNames.T:
+                //print("Made ")
+                //GameObject currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity);
+                //currentPiece.transform.SetParent(this.transform);
+                break;
+            case pieceNames.L:
+                print("In the L case");
+                this.currentPiece = Instantiate(L, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
+                print("Instantiate the game object");
+            
+                print("Setting the piece's parent as the piece object");
+                currentPiece.transform.parent = this.gameObject.transform;
+
+                
+                break;
+        }
+
+        //Now enable the step for it to move down the board
+        this.stepEnabled =  true;
+
+        //Reset the part piece locations
+        this.PiecePartLocations.Clear();
+
+        //Now set the piece part list
+        this.PieceParts = getChildren(this.transform.GetChild(0).gameObject);
+
+        //print("Name of next piece picked: " + randomPiece.DisplayName());
     }
 
     bool validHorizontalMoveChecker(float movementDirectionModifier) {
