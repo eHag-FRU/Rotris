@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -21,17 +22,28 @@ public class BackBoardPiece : MonoBehaviour
 
     //private int vectorIndexReal;
 
+    //Will hold the collider for the part piece that is currently there
+    [SerializeField]
+    private Collider2D partPiece;
+
     
     void Start()
     {
         //Automatically set that there is not a piece present on top of it
         piecePresent = 0;
+
+        //Set the part piece to null as no current part piece is there
+        partPiece = null;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public GameObject GetPiecePartOnBackBoard() {
+        return partPiece.gameObject;
     }
 
     public void OnTriggerEnter2D(Collider2D other) {
@@ -41,6 +53,7 @@ public class BackBoardPiece : MonoBehaviour
             //the piece is there, now signal there is a piece there
             //print($"{other.name.ToUpper()}'S TAG IS Piece");
             piecePresent = 1;
+            partPiece = other;
             return;
         }
     }
@@ -52,6 +65,7 @@ public class BackBoardPiece : MonoBehaviour
         //if (other.tag == "Piece") {
             //the piece is there, now signal there is a piece there
             piecePresent = 0;
+            partPiece = null;
             return;
         //}
     }

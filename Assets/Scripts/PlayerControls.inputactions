@@ -67,6 +67,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "DEBUG_LOCK_TIMER",
+                    "type": "Button",
+                    "id": "ab5f9077-d397-44f4-8292-7711ec651c88",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -166,6 +175,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "DEBUG_RELEAESE_PIECE",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "aac1e9f3-3b9e-4a06-af2c-8bddc2b4a8cf",
+                    "path": "<Keyboard>/h",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DEBUG_LOCK_TIMER",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

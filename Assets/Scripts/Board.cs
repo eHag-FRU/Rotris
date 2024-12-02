@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Text;
@@ -39,12 +40,21 @@ public class Board : MonoBehaviour
     public static int cols = 10;
 
     public static int score = 0;
+    public static int level = 0;
+    public static int lines = 0;
 
     private int scoreReal = 0;
-
+    private int levelReal = 0;
+    private int linesReal = 0;
 
     [SerializeField]
     private TextMeshProUGUI scoreText;
+
+    [SerializeField]
+    private TextMeshProUGUI linesText;
+
+    [SerializeField]
+    private TextMeshProUGUI levelText;
 
 
     // Start is called before the first frame update
@@ -59,8 +69,20 @@ public class Board : MonoBehaviour
         //Update the score
         scoreReal = score;
 
+        //Update the level
+        levelReal = level;
+
+        //Update the lines
+        linesReal = lines;
+
         //Update the score text
         updateScoreText();
+
+        //Update the level text
+        updateLevelText();
+
+        //Update the lines text
+        updateLinesText();
 
         //Grab the piece
         GameObject[] testBackBoard = GameObject.FindGameObjectsWithTag("Backboard_Piece");
@@ -80,15 +102,137 @@ public class Board : MonoBehaviour
 
 
 
+        
+
+    }
+
+    public static void checkBoardForLineClears() {
+        List<int> rowsToClear = new List<int>();
+
+        //Will hold the current level to ensure that at level 0 
+        //some score gets added
+        int localLevelHolder = level;
+
+        if (localLevelHolder == 0) {
+            localLevelHolder += 1;
+        }
+
         //Check the actual board vector for line clears
         for (int i = 0; i < rows; ++i) {
             if (checkFullRow(i)) {
                 //Row is full
-                //print("ROW " + i + " IS FULL!!!");
+                print("ROW " + i + " IS FULL!!!");
+
+                //Add to the rows to clear out
+                rowsToClear.Add(i);
             }
         }
 
+        //Figrue out the score
+        switch (rowsToClear.Count()) {
+            case 4:
+            
+                print("Score to add: " + (800*level));
+                updateScore((800 * level));
+                break;
+            case 3:
+                updateScore((500 * level));
+                break;
+            case 2:
+                updateScore((300 * level));
+                break;
+            default:
+                //1 line
+                updateScore((100 * level));
+                break;
+        }
+
+        //Now clear those lines
+        for (int lineRow = 0; lineRow < rowsToClear.Count; lineRow++) {
+            //print("In line " + lineRow);
+            for (int lineCol = 0; lineCol < cols; lineCol++) {
+                print("In line col " + lineCol);
+                //Now in the individual back board piece
+
+                //Grab the backboard piece
+                BackBoardPiece currentBackBoardPiece = GetBackBoardPiece(rowsToClear[lineRow], lineCol);
+
+                //Now grab the piece part with it
+                GameObject currentPiece = currentBackBoardPiece.GetPiecePartOnBackBoard();
+
+                //currentPiece.SetActive(false);
+
+                // print("Piece part name: " + currentPiece.name);
+
+                //Now remove the part
+                Destroy(currentPiece);
+                //print("Destroyed the current piece");
+
+                //Set the piece present switch to 0 (no piece is now present)
+                currentBackBoardPiece.piecePresent = 0;
+            }
+        }
+
+        //Update the line cleared counter
+        lines += rowsToClear.Count; 
+
+        //Grab the lowest number line cleared (This is the highest up line!!)
+        //Bottom of the board is 19 and the top is 0
+        int highestLineCleared = 20;
+
+        for (int i = 0; i < rowsToClear.Count; i++) {
+            if (rowsToClear[i] < highestLineCleared) {
+                highestLineCleared = rowsToClear[i];
+            }
+        }
+
+        print("Highest line cleared: " + highestLineCleared);
+        //Now need to move all the pieces down a line
+        Board.moveLinesDownAfterClear(highestLineCleared, rowsToClear.Count);
+
     }
+
+    public static void moveLinesDownAfterClear(int highestRowToClear, int numberOfRowsCleared) {
+        print("moveLinesDownAfterClear: Moving the lines down after clear!!!");
+        print("moveLinesDownAfterClear: highestRowToClear - 1: " + (highestRowToClear - 1));
+        //Now need to grab each and move each piece part down by the number of rows cleared * 2 Unity Units per step
+        for (int currentRow = highestRowToClear - 1; currentRow >= 0; currentRow--) {
+            print("moveLinesDownAfterClear: CurrentRow: " + currentRow);
+            //Grab each piece part
+            for (int currentCol = 0; currentCol < cols; currentCol++) {
+                print("moveLinesDownAfterClear: currentCol: " + currentCol);
+
+                //Grab the backboard piece
+                BackBoardPiece currentBackBoardPiece = GetBackBoardPiece(currentRow, currentCol);
+
+                print("moveLinesDownAfterClear: Piece present at [" + currentRow + "," + currentCol + "]?: " + currentBackBoardPiece.piecePresent);
+
+                if (currentBackBoardPiece.piecePresent == 1) {
+                    print("moveLinesDownAfterClear: There is a piece present at [" + currentRow + "," + currentCol + "]");
+                    //Now grab the piece part with it
+                    GameObject currentPiece = currentBackBoardPiece.GetPiecePartOnBackBoard();
+
+                    //Set the old location to have no piece present
+                    currentBackBoardPiece.piecePresent = 0;
+
+                    //Now we can move the piece down
+
+                    //The new position will be the current position - (2 Unity Units per step * number of Rows cleared)
+                    float newYPosition = currentPiece.transform.position.y - (2 * numberOfRowsCleared);
+                    print("moveLinesDownAfterClear: New y position: " + newYPosition);
+                    currentPiece.transform.position = new UnityEngine.Vector3(currentPiece.transform.position.x, newYPosition, currentPiece.transform.position.z );
+                    
+                    //Update the piece part location
+                    currentPiece.GetComponent<PiecePart_Location>().updatePartLocation((currentRow - numberOfRowsCleared), currentCol);
+
+                    //Set the backboard piece that the piece part is at to now have a piece present
+                    currentBackBoardPiece = GetBackBoardPiece((currentRow - numberOfRowsCleared), currentCol);
+                    currentBackBoardPiece.piecePresent = 1;
+                }
+            }
+        }
+    }
+
 
     public static String printBoardVectorState() {
         StringBuilder boardString = new StringBuilder();
@@ -132,5 +276,17 @@ public class Board : MonoBehaviour
 
     private void updateScoreText() {
         scoreText.text = scoreReal.ToString();
+    }
+
+    private void updateLevelText() {
+        levelText.text = levelReal.ToString();
+    }
+
+    private void updateLinesText() {
+        linesText.text = linesReal.ToString();
+    }
+
+    private static BackBoardPiece GetBackBoardPiece(int row, int col) {
+       return GameObject.Find(("Tile_"+row+"-"+col)).GetComponent<BackBoardPiece>();
     }
 }

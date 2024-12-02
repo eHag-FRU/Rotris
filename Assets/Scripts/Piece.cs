@@ -8,7 +8,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Piece_Backup : MonoBehaviour {
+public class Piece : MonoBehaviour {
 
 
     //Timing delays for the movement downward
@@ -67,6 +67,9 @@ public class Piece_Backup : MonoBehaviour {
     //REMOVE for release, used to test the piece picker functionality
     private InputAction DEBUG_PIECE_RELEASE;
 
+    //REMOVE for release, used to test the lock timer functionality
+    private InputAction DEBUG_LOCK_TIMER;
+
     //Smaller blocks that make up the piece locations
     //and gameobjects
 
@@ -121,6 +124,7 @@ public class Piece_Backup : MonoBehaviour {
         hardDrop = playerInput.actions["HardDrop"];
         hold = playerInput.actions["Hold"];
         DEBUG_PIECE_RELEASE = playerInput.actions["DEBUG_RELEAESE_PIECE"];
+        DEBUG_LOCK_TIMER = playerInput.actions["DEBUG_LOCK_TIMER"];
 
 
         //Grab the current piece to control, the piece prefab is a child to the piece object
@@ -193,14 +197,20 @@ public class Piece_Backup : MonoBehaviour {
         if (DEBUG_PIECE_RELEASE.triggered) {
             print("DEBUG: Piece Release triggered!!");
 
-            //Detach the piece from the player controller
-            this.transform.DetachChildren();
-
-            //Set the current piece to none to remove rotations
-            this.currentPiece = null;
+            
 
             //Spawn a new piece onto the board
             pickNewPiece();
+        }
+
+        //DEBUG: Force the lock timer
+        if (DEBUG_LOCK_TIMER.triggered) {
+            print("DEBUG: LOCK TIMER triggered!!");
+
+            
+
+            //Lock timer every 0.5 seconds
+            Invoke("lockTimer", 0.5f);
         }
 
         //Check for step 
@@ -215,16 +225,37 @@ public class Piece_Backup : MonoBehaviour {
     } 
 
 
+    //Will hit at 0.5 seconds
+    void lockTimer() {
+        pickNewPiece();
+
+        //Cancel out the invoke
+        CancelInvoke("locktimer");
+    }
+
     void calculateHardDrop() {
         //Take each piece location and check the least furthest that can go down
         //The least will be what can actually go
         int shortestDropDistance = 0;
 
         print("calculating hard drop distance");
+
+        //Find the lowest point
+        Vector<Vector<int>> lowestPoints;
+
+        //Cycle through them to find the lowest points
+
+
     }
 
 
     void pickNewPiece() {
+        //Detach the piece from the player controller
+        this.transform.DetachChildren();
+
+        //Set the current piece to none to remove rotations
+        this.currentPiece = null;
+
         //Grab the enum of piece names
         Array values = Enum.GetValues(typeof(pieceNames));
 
@@ -244,9 +275,11 @@ public class Piece_Backup : MonoBehaviour {
         //Now get the piece prefab based oon its name
         switch (randomPiece) {
             case pieceNames.T:
-                //print("Made ")
-                //GameObject currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity);
-                //currentPiece.transform.SetParent(this.transform);
+                this.currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
+                print("Instantiate the game object");
+            
+                print("Setting the piece's parent as the piece object");
+                currentPiece.transform.parent = this.gameObject.transform;
                 break;
             case pieceNames.L:
                 print("In the L case");
@@ -259,6 +292,9 @@ public class Piece_Backup : MonoBehaviour {
                 
                 break;
         }
+
+        //Signal to the board that the row check is to happen, and full rows are to be cleared
+        Board.checkBoardForLineClears();
 
         //Now enable the step for it to move down the board
         this.stepEnabled =  true;
@@ -309,6 +345,7 @@ public class Piece_Backup : MonoBehaviour {
                     break;
                 } else if (partletLocation == PiecePartLocations[3]) {
                     //At the last location to check!!!
+                    
                     print(part.name + " is at last location to check " + partletLocation + " !!!!");
                 } else if (currentPartColl + movementDirectionModifier > 9 || currentPartColl + movementDirectionModifier < 0) {
 
