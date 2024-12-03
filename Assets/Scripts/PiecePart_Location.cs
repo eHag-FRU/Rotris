@@ -27,4 +27,16 @@ public class PiecePart_Location : MonoBehaviour
     public void updatePartLocation(int row, int column) {
         startingLocationReal = new Vector2Int(row, column);
     }
+
+
+    public UnityEngine.Vector2Int getLowestPiecePart(List<Vector2Int> PiecePartLocations) {
+        Vector2Int lowestLocation;
+
+        //2 conditions
+    }
+
+
+
+     
+
 }

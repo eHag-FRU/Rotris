@@ -64,6 +64,7 @@ public class Piece : MonoBehaviour {
     private GameObject PieceSpawnPoint;
 
 
+
     //REMOVE for release, used to test the piece picker functionality
     private InputAction DEBUG_PIECE_RELEASE;
 
@@ -94,6 +95,14 @@ public class Piece : MonoBehaviour {
         J,
         L
     }
+
+    //Holds the next piece
+    private pieceNames nextPiece;
+
+     //helps ensure that a new piece is not picked multiple times
+     bool piecePicked = false;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -151,19 +160,25 @@ public class Piece : MonoBehaviour {
     }
     // Update is called once per frame
     void Update(){
-        
-
-
-
         //Update the current piece position
         //currentPiece.position = new UnityEngine.Vector2(currentPiece.position.x + movement, currentPiece.position.y);
 
         if (pieceMovement.triggered) {
-            if (validHorizontalMoveChecker(pieceMovement.ReadValue<float>())) {
+            if (PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
                 currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>() * 2,
                 currentPiece.position.y);
 
-                piecePartHorizontalLocationUpdater(pieceMovement.ReadValue<float>());
+                PiecePart_HorizontalMovement.piecePartHorizontalLocationUpdater(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations);
+            } else {
+                //Movement is not valid, either at bottom of the board or cant move down
+                // print("At bottom or can not move");
+                // stepEnabled = false;
+
+                // //Start the lock timer
+                // Invoke("lockTimer", 0.5f);
+                
+                // //Now pick a new piece
+                // pickNewPiece();
             }
             
         }
@@ -173,23 +188,43 @@ public class Piece : MonoBehaviour {
         if (pieceRotation.triggered) {
             //Rotate in increments of 90 deg
             
-            currentPiece.rotation += 90;
+            //Now check if the rotations would be valid
+            if(PiecePart_RotationMovement.piecePartRotationValidator(PieceParts, PiecePartLocations)) {
+                currentPiece.rotation += 90;
 
-            //Update after the rotation
-            piecePartRotationLocationUpdater();
+                //Update after the rotation
+                PiecePart_RotationMovement.piecePartRotationLocationUpdater(PieceParts, PiecePartLocations);
+            }
+            
         }
 
         //Soft Drop
         if (softDrop.triggered) {
             //Move the piece down by one
 
-            if (validVerticalMoveChecker()) {
+            if (PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {
                 this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
             
-                piecePartVetricalLocationUpdater();
+                PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
 
                 //Update the score by one
                 Board.updateScore(1);
+            }else {
+                //Movement is not valid, either at bottom of the board or cant move down
+                // print("At bottom or can not move");
+                // stepEnabled = false;
+
+                
+                // //Only if there is a piece that is present
+                // //Then do this, this keeps from when there is no piece
+                // if (currentPiece != null) {
+                //     //Start the lock timer
+                //     Invoke("lockTimer", 0.5f);
+
+                //     //Now pick a new piece
+                //     pickNewPiece();
+                // }
+                
             }
         }
 
@@ -227,7 +262,11 @@ public class Piece : MonoBehaviour {
 
     //Will hit at 0.5 seconds
     void lockTimer() {
-        pickNewPiece();
+        //Detach the piece from the player controller
+        this.transform.DetachChildren();
+
+        //Set the current piece to none to remove rotations
+        this.currentPiece = null;
 
         //Cancel out the invoke
         CancelInvoke("locktimer");
@@ -250,12 +289,6 @@ public class Piece : MonoBehaviour {
 
 
     void pickNewPiece() {
-        //Detach the piece from the player controller
-        this.transform.DetachChildren();
-
-        //Set the current piece to none to remove rotations
-        this.currentPiece = null;
-
         //Grab the enum of piece names
         Array values = Enum.GetValues(typeof(pieceNames));
 
@@ -294,7 +327,7 @@ public class Piece : MonoBehaviour {
         }
 
         //Signal to the board that the row check is to happen, and full rows are to be cleared
-        Board.checkBoardForLineClears();
+        //Board.checkBoardForLineClears();
 
         //Now enable the step for it to move down the board
         this.stepEnabled =  true;
@@ -308,222 +341,13 @@ public class Piece : MonoBehaviour {
         //print("Name of next piece picked: " + randomPiece.DisplayName());
     }
 
-    bool validHorizontalMoveChecker(float movementDirectionModifier) {
-        print("PiecePartLocations: " + PiecePartLocations.ToString());
-
-        //Check for each piece location
-        foreach (GameObject part in PieceParts) {
-            print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().y);
-            
-            //
-            //X = Row
-            //Y = Column
-            //
-
-            int currentPartRow = part.GetComponent<PiecePart_Location>().getPartLocation().x;
-            int currentPartColl= part.GetComponent<PiecePart_Location>().getPartLocation().y;
-
-
-            //Now we have a single piece part's row and collumn
-            //Now compare against every other piece part's location
-            //Based on row + 1 (x part of the vectors) => The next position after the step
-            //This will tell us if the row right below (at same coll)
-            //Has a piece part in it OR if another block is occupying it
-            //Piece part in it => then its valid to move, as that
-            //piece part is going to move down
-
-            //NOT piece part
-            //Then invalid and start the lock timer
-            //This means its it something else!
-
-            foreach(Vector2Int partletLocation in PiecePartLocations) {
-                //If in the col + 1 is equal to one of the other pieceparts locations, break
-                //and continue cycling through
-                if (currentPartColl + movementDirectionModifier == partletLocation.y) {
-                    //We already found its new position, no need to continue, break!
-                    print("Already found new position that another partlet has");
-                    break;
-                } else if (partletLocation == PiecePartLocations[3]) {
-                    //At the last location to check!!!
-                    
-                    print(part.name + " is at last location to check " + partletLocation + " !!!!");
-                } else if (currentPartColl + movementDirectionModifier > 9 || currentPartColl + movementDirectionModifier < 0) {
-
-                    print("At Right OR Left of board!!!");
-
-                    return false;
-                }
-
-                //print (part.name + " still checking for the coll occupying " + currentPartRow + ", " + currentPartColl);
-            }
-
-            
-            
-
-           print("Done checking partlet location matches, NOT IT");
-        }
-
-
-        return true;
-    }
-
-    void piecePartRotationLocationUpdater() {
-        //Clear the locations to allow for new
-        PiecePartLocations.Clear();
-        
-
-
-        //Now update the pice part locations
-        foreach (GameObject part in PieceParts) {
-            //print("Horizontal Location Updater: " + movementDirectionModifier);
-
-            //Calculate the new x and y
-            //X = Row
-            //Y = Column
-            int x = part.GetComponent<PiecePart_Location>().getPartLocation().x;
-            int y = part.GetComponent<PiecePart_Location>().getPartLocation().y;
-
-            //Formula for an 90 deg rotation counter-clock wise
-            //(x,y) =(Rotation)=> (y-1, x + 1)
-            //Rotation point is from the bottom of the piece (lowest point) as center!!!
-
-            int newX = x + 1;
-            int newY = y - 1;
-
-            //Update them
-            part.GetComponent<PiecePart_Location>().updatePartLocation(newY, newX);
-
-            //Update the location in the parts location
-            PiecePartLocations.Add(part.GetComponent<PiecePart_Location>().getPartLocation());
-
-            print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
-        }
-
-    }
-
-
-    void piecePartHorizontalLocationUpdater(float movementDirectionModifier) {
-        //Clear the locations to allow for new
-        PiecePartLocations.Clear();
-        
-
-
-        //Now update the pice part locations
-        foreach (GameObject part in PieceParts) {
-            print("Horizontal Location Updater: " + movementDirectionModifier);
-
-            //Calculate the new x and y
-            //X = Row
-            //Y = Column
-            int x = part.GetComponent<PiecePart_Location>().getPartLocation().x;
-            int y = part.GetComponent<PiecePart_Location>().getPartLocation().y + (int)movementDirectionModifier;
-
-            //Update them
-            part.GetComponent<PiecePart_Location>().updatePartLocation(x,y);
-
-            //Update the location in the parts location
-            PiecePartLocations.Add(part.GetComponent<PiecePart_Location>().getPartLocation());
-
-            print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
-        }
-
-    }
-
-
-    bool validVerticalMoveChecker() {
-        print("PiecePartLocations: " + PiecePartLocations.ToString());
-
-        //Check for each piece location
-        foreach (GameObject part in PieceParts) {
-            print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
-            
-            //
-            //X = Row
-            //Y = Column
-            //
-
-            int currentPartRow = part.GetComponent<PiecePart_Location>().getPartLocation().x;
-            int currentPartColl= part.GetComponent<PiecePart_Location>().getPartLocation().y;
-
-
-            //Now we have a single piece part's row and collumn
-            //Now compare against every other piece part's location
-            //Based on row + 1 (x part of the vectors) => The next position after the step
-            //This will tell us if the row right below (at same coll)
-            //Has a piece part in it OR if another block is occupying it
-            //Piece part in it => then its valid to move, as that
-            //piece part is going to move down
-
-            //NOT piece part
-            //Then invalid and start the lock timer
-            //This means its it something else!
-
-            foreach(Vector2Int partletLocation in PiecePartLocations) {
-                //If in the row + 1 is equal to one of the other pieceparts locations, break
-                //and continue cycling through
-                if (currentPartRow + 1 == partletLocation.x) {
-                    //We already found its new position, no need to continue, break!
-                    print("Already found new position that another partlet has");
-                    break;
-                } else if (partletLocation == PiecePartLocations[3]) {
-                    //At the last location to check!!!
-                    print(part.name + " is at last location to check " + partletLocation + " !!!!");
-                } else if (currentPartRow + 1 > 19 || currentPartRow == 19) {
-                    //Piece is at bottom
-                    stepEnabled = false;
-
-                    print("At bottom of board!!!");
-
-                    //Drop piece
-                    part.transform.DetachChildren();
-
-                    return false;
-                }
-
-                //print (part.name + " still checking for the coll occupying " + currentPartRow + ", " + currentPartColl);
-            }
-
-            
-            
-
-           print("Done checking partlet location matches, NOT IT");
-        }
-
-
-        return true;
-    }
-
-    void piecePartVetricalLocationUpdater() {
-        //Clear the locations to allow for new
-        PiecePartLocations.Clear();
-        
-
-
-        //Now update the pice part locations
-        foreach (GameObject part in PieceParts) {
-            
-            //Calculate the new x and y
-            //X = Row
-            //Y = Column
-            int x = part.GetComponent<PiecePart_Location>().getPartLocation().x + 1;
-            int y = part.GetComponent<PiecePart_Location>().getPartLocation().y;
-
-            //Update them
-            part.GetComponent<PiecePart_Location>().updatePartLocation(x,y);
-
-            //Update the location in the parts location
-            PiecePartLocations.Add(part.GetComponent<PiecePart_Location>().getPartLocation());
-
-            //print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
-        }
-
-    }
+       
 
     void Step(){
         print("Making a step");
 
         //Check if valid for vertical
-        if (!validVerticalMoveChecker()) {
+        if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {
             return;
         }
 
@@ -532,15 +356,12 @@ public class Piece : MonoBehaviour {
         this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
 
 
-        piecePartVetricalLocationUpdater();
+        PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
         
         
         CancelInvoke("Step");   
     }
 
-    // void OnCollisionEnter2D(Collider2D other) {
-    //     print("ENTERED A 2D Collider!!!");
-    // }
 
     //Will grab all the children piece parts for the positions to be grabbed of the current active piece
     List<GameObject> getChildren(GameObject parent) {

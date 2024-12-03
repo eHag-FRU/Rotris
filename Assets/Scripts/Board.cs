@@ -197,19 +197,20 @@ public class Board : MonoBehaviour
         print("moveLinesDownAfterClear: highestRowToClear - 1: " + (highestRowToClear - 1));
         //Now need to grab each and move each piece part down by the number of rows cleared * 2 Unity Units per step
         for (int currentRow = highestRowToClear - 1; currentRow >= 0; currentRow--) {
-            print("moveLinesDownAfterClear: CurrentRow: " + currentRow);
+            //print("moveLinesDownAfterClear: CurrentRow: " + currentRow);
             //Grab each piece part
             for (int currentCol = 0; currentCol < cols; currentCol++) {
-                print("moveLinesDownAfterClear: currentCol: " + currentCol);
+                //print("moveLinesDownAfterClear: currentCol: " + currentCol);
 
                 //Grab the backboard piece
                 BackBoardPiece currentBackBoardPiece = GetBackBoardPiece(currentRow, currentCol);
 
-                print("moveLinesDownAfterClear: Piece present at [" + currentRow + "," + currentCol + "]?: " + currentBackBoardPiece.piecePresent);
+                //print("moveLinesDownAfterClear: Piece present at [" + currentRow + "," + currentCol + "]?: " + currentBackBoardPiece.piecePresent);
 
                 if (currentBackBoardPiece.piecePresent == 1) {
-                    print("moveLinesDownAfterClear: There is a piece present at [" + currentRow + "," + currentCol + "]");
+                    //print("moveLinesDownAfterClear: There is a piece present at [" + currentRow + "," + currentCol + "]");
                     //Now grab the piece part with it
+                    print("moveLinesDownAfterClear: Grabbing the current back board piece, line 213!");
                     GameObject currentPiece = currentBackBoardPiece.GetPiecePartOnBackBoard();
 
                     //Set the old location to have no piece present
@@ -223,13 +224,24 @@ public class Board : MonoBehaviour
                     currentPiece.transform.position = new UnityEngine.Vector3(currentPiece.transform.position.x, newYPosition, currentPiece.transform.position.z );
                     
                     //Update the piece part location
-                    currentPiece.GetComponent<PiecePart_Location>().updatePartLocation((currentRow - numberOfRowsCleared), currentCol);
+                    //currentPiece.GetComponent<PiecePart_Location>().updatePartLocation((currentRow - numberOfRowsCleared), currentCol);
 
                     //Set the backboard piece that the piece part is at to now have a piece present
-                    currentBackBoardPiece = GetBackBoardPiece((currentRow - numberOfRowsCleared), currentCol);
-                    currentBackBoardPiece.piecePresent = 1;
+                    //currentBackBoardPiece = GetBackBoardPiece((currentRow - numberOfRowsCleared), currentCol);
+                    //currentBackBoardPiece.piecePresent = 1;
                 }
             }
+        }
+
+        //Now set the last row that was moved from (the highest one up the board) to have no pieces
+        int rowtoSetToNoPiecesPresent = highestRowToClear - numberOfRowsCleared;
+
+        print("moveLinesDownAfterClear: Row to set to no pieces present: " + rowtoSetToNoPiecesPresent);
+
+        for (int currentCol = 0; currentCol < cols; currentCol++) {
+            BackBoardPiece currentBackBoardPiece = GetBackBoardPiece(rowtoSetToNoPiecesPresent, currentCol);
+
+            currentBackBoardPiece.piecePresent = 0;
         }
     }
 
@@ -288,5 +300,10 @@ public class Board : MonoBehaviour
 
     private static BackBoardPiece GetBackBoardPiece(int row, int col) {
        return GameObject.Find(("Tile_"+row+"-"+col)).GetComponent<BackBoardPiece>();
+    }
+
+
+    public static void SetNextPiece(String pieceName) {
+
     }
 }
