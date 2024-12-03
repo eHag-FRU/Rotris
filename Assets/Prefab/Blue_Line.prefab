@@ -30,10 +30,10 @@ Transform:
   m_LocalScale: {x: 4.156292, y: 3.927329, z: 3.927328}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2063268267723545430}
-  - {fileID: 7295504492452840509}
   - {fileID: 9005757409280479941}
   - {fileID: 6951836735317402695}
+  - {fileID: 2063268267723545430}
+  - {fileID: 7295504492452840509}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &-4260588610760911741
@@ -76,8 +76,8 @@ GameObject:
   - component: {fileID: 1655758134721494879}
   - component: {fileID: 3852962505260687393}
   m_Layer: 6
-  m_Name: Top (2)
-  m_TagString: Piece
+  m_Name: Middle_Top
+  m_TagString: Piece_Part
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -220,8 +220,8 @@ GameObject:
   - component: {fileID: 4391630313131098709}
   - component: {fileID: 4990059970045260494}
   m_Layer: 6
-  m_Name: Top (1)
-  m_TagString: Piece
+  m_Name: Top
+  m_TagString: Piece_Part
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -364,8 +364,8 @@ GameObject:
   - component: {fileID: 4662676923820574100}
   - component: {fileID: 5996625022268560718}
   m_Layer: 6
-  m_Name: Top
-  m_TagString: Piece
+  m_Name: Bottom
+  m_TagString: Piece_Part
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -508,8 +508,8 @@ GameObject:
   - component: {fileID: 5892637353844177260}
   - component: {fileID: 6991232857188843710}
   m_Layer: 6
-  m_Name: Top (3)
-  m_TagString: Piece
+  m_Name: Middle_Bottom
+  m_TagString: Piece_Part
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -6,11 +6,12 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
 {
 
     public static bool validHorizontalMoveChecker(float movementDirectionModifier, List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations) {
-            print("PiecePartLocations: " + PiecePartLocations.ToString());
+            //print("PiecePartLocations: " + PiecePartLocations.ToString());
+    
 
             //Check for each piece location
             foreach (GameObject part in PieceParts) {
-                print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().y);
+                //print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().y);
                 
                 //
                 //X = Row
@@ -38,15 +39,15 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
                     //and continue cycling through
                     if (currentPartColl + movementDirectionModifier == partletLocation.y) {
                         //We already found its new position, no need to continue, break!
-                        print("Already found new position that another partlet has");
+                        //print("Already found new position that another partlet has");
                         break;
                     } else if (partletLocation == PiecePartLocations[3]) {
                         //At the last location to check!!!
                         
-                        print(part.name + " is at last location to check " + partletLocation + " !!!!");
+                        //print(part.name + " is at last location to check " + partletLocation + " !!!!");
                     } else if (currentPartColl + movementDirectionModifier > 9 || currentPartColl + movementDirectionModifier < 0) {
 
-                        print("At Right OR Left of board!!!");
+                        //print("At Right OR Left of board!!!");
 
                         return false;
                     }
@@ -74,7 +75,7 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
 
         //Now update the pice part locations
         foreach (GameObject part in PieceParts) {
-            print("Horizontal Location Updater: " + movementDirectionModifier);
+            //print("Horizontal Location Updater: " + movementDirectionModifier);
 
             //Calculate the new x and y
             //X = Row
@@ -88,7 +89,7 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
             //Update the location in the parts location
             PiecePartLocations.Add(part.GetComponent<PiecePart_Location>().getPartLocation());
 
-            print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
+            //print(part.name + " AFTER: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
         }
 
     }

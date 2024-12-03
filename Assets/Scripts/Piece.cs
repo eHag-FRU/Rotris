@@ -164,23 +164,18 @@ public class Piece : MonoBehaviour {
         //currentPiece.position = new UnityEngine.Vector2(currentPiece.position.x + movement, currentPiece.position.y);
 
         if (pieceMovement.triggered) {
-            if (PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
+            if (!PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
+                //Can not keep moving, need to stop moving and handle case
+                
+               
+            } else {
+
+                //Valid, so move the piece down
                 currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>() * 2,
                 currentPiece.position.y);
 
                 PiecePart_HorizontalMovement.piecePartHorizontalLocationUpdater(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations);
-            } else {
-                //Movement is not valid, either at bottom of the board or cant move down
-                // print("At bottom or can not move");
-                // stepEnabled = false;
-
-                // //Start the lock timer
-                // Invoke("lockTimer", 0.5f);
-                
-                // //Now pick a new piece
-                // pickNewPiece();
             }
-            
         }
 
 
@@ -202,37 +197,26 @@ public class Piece : MonoBehaviour {
         if (softDrop.triggered) {
             //Move the piece down by one
 
-            if (PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {
+            if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {
+                print("Hit bottom of board or piece");
+
+                //Disable the step
+                stepEnabled = false;
+    
+            } else {
+                //True, can move down
                 this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
             
                 PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
 
                 //Update the score by one
                 Board.updateScore(1);
-            }else {
-                //Movement is not valid, either at bottom of the board or cant move down
-                // print("At bottom or can not move");
-                // stepEnabled = false;
-
-                
-                // //Only if there is a piece that is present
-                // //Then do this, this keeps from when there is no piece
-                // if (currentPiece != null) {
-                //     //Start the lock timer
-                //     Invoke("lockTimer", 0.5f);
-
-                //     //Now pick a new piece
-                //     pickNewPiece();
-                // }
-                
             }
         }
 
         //DEBUG: Force release of a piece to test spawn points
         if (DEBUG_PIECE_RELEASE.triggered) {
             print("DEBUG: Piece Release triggered!!");
-
-            
 
             //Spawn a new piece onto the board
             pickNewPiece();
@@ -242,17 +226,9 @@ public class Piece : MonoBehaviour {
         if (DEBUG_LOCK_TIMER.triggered) {
             print("DEBUG: LOCK TIMER triggered!!");
 
-            
-
             //Lock timer every 0.5 seconds
             Invoke("lockTimer", 0.5f);
         }
-
-        //Check for step 
-        
-       
-    
-
 
         if (stepEnabled) {
             Invoke("Step", 1F);
@@ -298,7 +274,7 @@ public class Piece : MonoBehaviour {
         // print((pieceNames)values.GetValue());
 
         //Grabs the random piece name
-        print("Next Random Value: " + randomPiecePicker.Next(values.Length));
+        //print("Next Random Value: " + randomPiecePicker.Next(values.Length));
         pieceNames randomPiece = (pieceNames)values.GetValue(randomPiecePicker.Next(values.Length));
 
         //DEBUG: REMOVE BEFORE RELEASE!!!!
@@ -309,17 +285,17 @@ public class Piece : MonoBehaviour {
         switch (randomPiece) {
             case pieceNames.T:
                 this.currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
-                print("Instantiate the game object");
+                //print("Instantiate the game object");
             
-                print("Setting the piece's parent as the piece object");
+                //print("Setting the piece's parent as the piece object");
                 currentPiece.transform.parent = this.gameObject.transform;
                 break;
             case pieceNames.L:
-                print("In the L case");
+                //print("In the L case");
                 this.currentPiece = Instantiate(L, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
-                print("Instantiate the game object");
+                //print("Instantiate the game object");
             
-                print("Setting the piece's parent as the piece object");
+                //print("Setting the piece's parent as the piece object");
                 currentPiece.transform.parent = this.gameObject.transform;
 
                 
@@ -344,7 +320,7 @@ public class Piece : MonoBehaviour {
        
 
     void Step(){
-        print("Making a step");
+        //print("Making a step");
 
         //Check if valid for vertical
         if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {

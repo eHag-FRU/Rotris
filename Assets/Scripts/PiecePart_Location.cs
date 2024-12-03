@@ -29,11 +29,11 @@ public class PiecePart_Location : MonoBehaviour
     }
 
 
-    public UnityEngine.Vector2Int getLowestPiecePart(List<Vector2Int> PiecePartLocations) {
-        Vector2Int lowestLocation;
+    // public UnityEngine.Vector2Int getLowestPiecePart(List<Vector2Int> PiecePartLocations) {
+    //     Vector2Int lowestLocation;
 
-        //2 conditions
-    }
+    //     //2 conditions
+    // }
 
 
 

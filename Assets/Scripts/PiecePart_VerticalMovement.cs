@@ -6,13 +6,13 @@ public class PiecePart_VerticalMovement : MonoBehaviour
 {
 
     public static bool validVerticalMoveChecker(List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations) {
-        print("PiecePartLocations: " + PiecePartLocations.ToString());
+        //print("PiecePartLocations: " + PiecePartLocations.ToString());
 
        
 
         //Check for each piece location
         foreach (GameObject part in PieceParts) {
-            print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
+            //print(part.name + " BEFORE: " + part.GetComponent<PiecePart_Location>().getPartLocation().x);
             
             //
             //X = Row
@@ -40,27 +40,35 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                 //and continue cycling through
                 if (currentPartRow + 1 == partletLocation.x) {
                     //We already found its new position, no need to continue, break!
-                    print("Already found new position that another partlet has");
+                    //print("Already found new position that another partlet has");
                     break;
                 } else if (partletLocation == PiecePartLocations[3]) {
+                    print(part.name + " location: " + "(" + currentPartRow + "," + currentPartColl + ")");
+                    print(part.name + " one below location: " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")");
+                    
+
                     //At the last location to check!!!
-                    print(part.name + " is at last location to check " + partletLocation + " !!!!");
+                    //print(part.name + " is at last location to check " + partletLocation + " !!!!");
 
                     //Now check 1 part below
                     int pieceBelow = Board.getPiecePresent((currentPartRow + 1), currentPartColl);
 
+                    print("Another piece below at " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")" + ": " + pieceBelow);
+
                     if (pieceBelow == 1) {
+                        print("Hit another piece!");
                         //Need to start lock timer and pick new piece!!
                         return false;
                     }
-
+                    
+                    print("Not hitting another piece, keep moving!");
                     return true;
 
                 } else if (currentPartRow + 1 > 19 || currentPartRow == 19) {
                     // //Piece is at bottom
                     // stepEnabled = false;
 
-                    // print("At bottom of board!!!");
+                    print("At bottom of board!!!");
 
                     // //lock piece in
                     // Invoke("lockTimer", 0.5f);
@@ -74,7 +82,7 @@ public class PiecePart_VerticalMovement : MonoBehaviour
             
             
 
-           print("Done checking partlet location matches, NOT IT");
+           //print("Done checking partlet location matches, NOT IT");
         }
 
 
