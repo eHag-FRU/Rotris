@@ -168,7 +168,7 @@ public class Piece : MonoBehaviour {
                 //Can not keep moving, need to stop moving and handle case
                 
                 //Pick a new piece, locked into place already
-                pickNewPiece();
+                //pickNewPiece();
                 
                
             } else {
@@ -207,7 +207,7 @@ public class Piece : MonoBehaviour {
                 stepEnabled = false;
 
                 //Pick a new piece
-                pickNewPiece();
+                //pickNewPiece();
 
 
         
@@ -253,6 +253,14 @@ public class Piece : MonoBehaviour {
 
         //Set the current piece to none to remove rotations
         this.currentPiece = null;
+
+
+        //Clear lines
+        //Board.checkBoardForLineClears();
+
+        print("Checking for game over!");
+        //Check for game over
+        Board.checkForGameOver();
 
         //Cancel out the invoke
         //CancelInvoke("locktimer");

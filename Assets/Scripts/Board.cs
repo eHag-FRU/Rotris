@@ -106,6 +106,19 @@ public class Board : MonoBehaviour
 
     }
 
+
+    public static void checkForGameOver() {
+        //Check the top row for a single block
+        //Top row is 0
+        print("Game over? (Row 0 have any in the row?)" + checkGameOverRow());
+
+
+        if (checkGameOverRow()) {
+            print("GAME OVER!");
+        }
+
+    }
+
     public static void checkBoardForLineClears() {
         List<int> rowsToClear = new List<int>();
 
@@ -174,21 +187,21 @@ public class Board : MonoBehaviour
         }
 
         //Update the line cleared counter
-        lines += rowsToClear.Count; 
+        //lines += rowsToClear.Count; 
 
         //Grab the lowest number line cleared (This is the highest up line!!)
         //Bottom of the board is 19 and the top is 0
-        int highestLineCleared = 20;
+        //int highestLineCleared = 20;
 
-        for (int i = 0; i < rowsToClear.Count; i++) {
-            if (rowsToClear[i] < highestLineCleared) {
-                highestLineCleared = rowsToClear[i];
-            }
-        }
+        //for (int i = 0; i < rowsToClear.Count; i++) {
+            // if (rowsToClear[i] < highestLineCleared) {
+                // highestLineCleared = rowsToClear[i];
+            // }
+        // }
 
-        print("Highest line cleared: " + highestLineCleared);
+        //print("Highest line cleared: " + highestLineCleared);
         //Now need to move all the pieces down a line
-        Board.moveLinesDownAfterClear(highestLineCleared, rowsToClear.Count);
+        //Board.moveLinesDownAfterClear(highestLineCleared, rowsToClear.Count);
 
     }
 
@@ -278,6 +291,19 @@ public class Board : MonoBehaviour
 
         //Passed the checks, so row is full
         return true;
+    }
+
+    public static bool checkGameOverRow() {
+        //Go through all columns of that row to check
+        for (int i = 0; i < cols; ++i) {
+            if (getPiecePresent(0, i) == 1) {
+                //Piece present, game over
+                return true;
+            }
+        }
+
+        //Passed the checks, so row is full
+        return false;
     }
 
 
