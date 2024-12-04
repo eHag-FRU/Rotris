@@ -167,7 +167,8 @@ public class Piece : MonoBehaviour {
             if (!PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
                 //Can not keep moving, need to stop moving and handle case
                 
-                //Lock the piece into place
+                //Pick a new piece, locked into place already
+                pickNewPiece();
                 
                
             } else {
@@ -204,6 +205,12 @@ public class Piece : MonoBehaviour {
 
                 //Disable the step
                 stepEnabled = false;
+
+                //Pick a new piece
+                pickNewPiece();
+
+
+        
     
             } else {
                 //True, can move down
