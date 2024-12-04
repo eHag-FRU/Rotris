@@ -62,6 +62,7 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
 
                         if (pieceToLeftOrRight == 1) {
                             //print("STOP! ANOTHER PIECE IS PRESENT!!!!!");
+
                             return false;
                         }
                         

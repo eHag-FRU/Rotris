@@ -70,7 +70,7 @@ public class PiecePart_RotationMovement : MonoBehaviour
 
     public static bool rotation90(Rigidbody2D piece, List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations) {
         //grab the bottom part
-        if(bottom)
+        //if(bottom)
 
         //Will always be 3 parts to rotate (4 parts - 1 bottom = 3 remaining parts)
         int numOfPartsToRotate = 3;
@@ -83,7 +83,7 @@ public class PiecePart_RotationMovement : MonoBehaviour
                 //DO NOT ROTATE VALIDATE
 
                 //Grab the bottom piece col
-                bottomCol = part.GetComponent<PiecePart_Location>().getPartLocation().y;
+                //bottomCol = part.GetComponent<PiecePart_Location>().getPartLocation().y;
 
 
                 continue;
@@ -101,11 +101,11 @@ public class PiecePart_RotationMovement : MonoBehaviour
                 //Now check if either would be out of bounds
                 //Formula to check if going to hit wall on 0 end
                 // Bottom X - number to rotate < 0    =====> CAN NOT ROTATE, DONT HAVE ROOM
-                if((bottomCol - numOfPartsToRotate) < 0) {
+                //if((bottomCol - numOfPartsToRotate) < 0) {
                     //Not valid, outside of the bounds for the cols
-                   print("INVALID ROTATE, WILL GO OUTSIDE INDEX 0 COL!!!");
-                    return false;
-                } 
+                   //print("INVALID ROTATE, WILL GO OUTSIDE INDEX 0 COL!!!");
+                    //return false;
+                //} 
                 
             }
         }

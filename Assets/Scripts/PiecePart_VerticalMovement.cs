@@ -5,7 +5,7 @@ using UnityEngine;
 public class PiecePart_VerticalMovement : MonoBehaviour
 {
 
-    public static bool validVerticalMoveChecker(List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations) {
+    public static bool validVerticalMoveChecker(List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations, Piece currentPiece) {
         //print("PiecePartLocations: " + PiecePartLocations.ToString());
 
        
@@ -58,6 +58,10 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                     if (pieceBelow == 1) {
                         // print("Hit another piece!");
                         //Need to start lock timer and pick new piece!!
+
+                        //Lock the piece
+                        currentPiece.lockPiece();
+
                         return false;
                     }
                     
@@ -71,6 +75,9 @@ public class PiecePart_VerticalMovement : MonoBehaviour
 
                     // //lock piece in
                     // Invoke("lockTimer", 0.5f);
+
+                    //Lock the piece
+                    currentPiece.lockPiece();
 
                     return false;
                 }

@@ -167,6 +167,8 @@ public class Piece : MonoBehaviour {
             if (!PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
                 //Can not keep moving, need to stop moving and handle case
                 
+                //Lock the piece into place
+                
                
             } else {
 
@@ -197,7 +199,7 @@ public class Piece : MonoBehaviour {
         if (softDrop.triggered) {
             //Move the piece down by one
 
-            if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {
+            if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations, this)) {
                 print("Hit bottom of board or piece");
 
                 //Disable the step
@@ -226,8 +228,9 @@ public class Piece : MonoBehaviour {
         if (DEBUG_LOCK_TIMER.triggered) {
             print("DEBUG: LOCK TIMER triggered!!");
 
+            lockPiece();
             //Lock timer every 0.5 seconds
-            Invoke("lockTimer", 0.5f);
+            //Invoke("lockTimer", 0.5f);
         }
 
         if (stepEnabled) {
@@ -237,7 +240,7 @@ public class Piece : MonoBehaviour {
 
 
     //Will hit at 0.5 seconds
-    void lockTimer() {
+    public void lockPiece() {
         //Detach the piece from the player controller
         this.transform.DetachChildren();
 
@@ -245,7 +248,7 @@ public class Piece : MonoBehaviour {
         this.currentPiece = null;
 
         //Cancel out the invoke
-        CancelInvoke("locktimer");
+        //CancelInvoke("locktimer");
     }
 
     void calculateHardDrop() {
@@ -323,7 +326,7 @@ public class Piece : MonoBehaviour {
         //print("Making a step");
 
         //Check if valid for vertical
-        if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations)) {
+        if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations, this)) {
             return;
         }
 
