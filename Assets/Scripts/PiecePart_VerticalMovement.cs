@@ -43,8 +43,8 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                     //print("Already found new position that another partlet has");
                     break;
                 } else if (partletLocation == PiecePartLocations[3]) {
-                    print(part.name + " location: " + "(" + currentPartRow + "," + currentPartColl + ")");
-                    print(part.name + " one below location: " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")");
+                    // print(part.name + " location: " + "(" + currentPartRow + "," + currentPartColl + ")");
+                    // print(part.name + " one below location: " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")");
                     
 
                     //At the last location to check!!!
@@ -53,22 +53,21 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                     //Now check 1 part below
                     int pieceBelow = Board.getPiecePresent((currentPartRow + 1), currentPartColl);
 
-                    print("Another piece below at " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")" + ": " + pieceBelow);
+                    // print("Another piece below at " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")" + ": " + pieceBelow);
 
                     if (pieceBelow == 1) {
-                        print("Hit another piece!");
+                        // print("Hit another piece!");
                         //Need to start lock timer and pick new piece!!
                         return false;
                     }
                     
-                    print("Not hitting another piece, keep moving!");
-                    return true;
+                    // print("Not hitting another piece, keep moving!");
 
                 } else if (currentPartRow + 1 > 19 || currentPartRow == 19) {
                     // //Piece is at bottom
                     // stepEnabled = false;
 
-                    print("At bottom of board!!!");
+                    // print("At bottom of board!!!");
 
                     // //lock piece in
                     // Invoke("lockTimer", 0.5f);

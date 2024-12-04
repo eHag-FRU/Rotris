@@ -7,7 +7,8 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
 
     public static bool validHorizontalMoveChecker(float movementDirectionModifier, List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations) {
             //print("PiecePartLocations: " + PiecePartLocations.ToString());
-    
+
+            //Will hold the validity
 
             //Check for each piece location
             foreach (GameObject part in PieceParts) {
@@ -42,8 +43,29 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
                         //print("Already found new position that another partlet has");
                         break;
                     } else if (partletLocation == PiecePartLocations[3]) {
+                        int newCollPosition = currentPartColl + (int)movementDirectionModifier;
+
                         //At the last location to check!!!
+                        // print(part.name + " location: " + "(" + currentPartRow + "," + currentPartColl + ")");
+                        // print(part.name + " one left/right location: " + "(" + currentPartRow + "," + newCollPosition + ")");
+                        // print(part.name + " direction modifier: " + (int)movementDirectionModifier);
+
                         
+
+                        //At the last location to check!!!
+                        //print(part.name + " is at last location to check " + partletLocation + " !!!!");
+
+                        //Now check 1 part to the left or to the right
+                        int pieceToLeftOrRight = Board.getPiecePresent(currentPartRow, newCollPosition);
+
+                        //print("Another piece to the left or right at " + "(" + currentPartRow + "," + newCollPosition + ")" + ": " + pieceToLeftOrRight);
+
+                        if (pieceToLeftOrRight == 1) {
+                            //print("STOP! ANOTHER PIECE IS PRESENT!!!!!");
+                            return false;
+                        }
+                        
+                            
                         //print(part.name + " is at last location to check " + partletLocation + " !!!!");
                     } else if (currentPartColl + movementDirectionModifier > 9 || currentPartColl + movementDirectionModifier < 0) {
 

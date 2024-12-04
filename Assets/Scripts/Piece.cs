@@ -184,7 +184,7 @@ public class Piece : MonoBehaviour {
             //Rotate in increments of 90 deg
             
             //Now check if the rotations would be valid
-            if(PiecePart_RotationMovement.piecePartRotationValidator(PieceParts, PiecePartLocations)) {
+            if(PiecePart_RotationMovement.piecePartRotationValidator(currentPiece, PieceParts, PiecePartLocations)) {
                 currentPiece.rotation += 90;
 
                 //Update after the rotation
