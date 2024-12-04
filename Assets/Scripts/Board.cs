@@ -9,6 +9,7 @@ using System.Text;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Board : MonoBehaviour
 {
@@ -115,8 +116,13 @@ public class Board : MonoBehaviour
 
         if (checkGameOverRow()) {
             print("GAME OVER!");
+            SceneManager.LoadScene("GameOver");
         }
 
+    }
+
+    public static int getScore() {
+        return score;
     }
 
     public static void checkBoardForLineClears() {
