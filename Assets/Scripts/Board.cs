@@ -111,7 +111,7 @@ public class Board : MonoBehaviour
     public static void checkForGameOver() {
         //Check the top row for a single block
         //Top row is 0
-        print("Game over? (Row 0 have any in the row?)" + checkGameOverRow());
+        print("Game over? (Row 3 have any in the row?)" + checkGameOverRow());
 
 
         if (checkGameOverRow()) {
@@ -302,7 +302,7 @@ public class Board : MonoBehaviour
     public static bool checkGameOverRow() {
         //Go through all columns of that row to check
         for (int i = 0; i < cols; ++i) {
-            if (getPiecePresent(0, i) == 1) {
+            if (getPiecePresent(2, i) == 1) {
                 //Piece present, game over
                 return true;
             }

@@ -59,6 +59,9 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                         // print("Hit another piece!");
                         //Need to start lock timer and pick new piece!!
 
+                        //Disable the step
+                        //stepEnabled = false;
+
                         //Lock the piece
                         currentPiece.lockPiece();
 
@@ -68,8 +71,8 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                     // print("Not hitting another piece, keep moving!");
 
                 } else if (currentPartRow + 1 > 19 || currentPartRow == 19) {
-                    // //Piece is at bottom
-                    // stepEnabled = false;
+                    //Piece is at bottom
+                    //stepEnabled = false;
 
                     // print("At bottom of board!!!");
 

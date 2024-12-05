@@ -206,8 +206,17 @@ public class Piece : MonoBehaviour {
                 //Disable the step
                 stepEnabled = false;
 
-                //Pick a new piece
-                //pickNewPiece();
+                //Lock the piece in
+                lockPiece();
+
+                if (!piecePicked) {
+                    //New piece has not been picked, now picking a new piece
+                    pickNewPiece();
+
+                    //Toggle it to be switched so another piece is not picked after one is picked
+                    piecePicked = true;
+                }
+                
 
 
         
@@ -220,6 +229,10 @@ public class Piece : MonoBehaviour {
 
                 //Update the score by one
                 Board.updateScore(1);
+
+
+                //Set the piece picked variable to allow for a new piece to be picked
+                piecePicked = false;
             }
         }
 
@@ -240,9 +253,9 @@ public class Piece : MonoBehaviour {
             //Invoke("lockTimer", 0.5f);
         }
 
-        if (stepEnabled) {
-            Invoke("Step", 1F);
-        }
+        // if (stepEnabled) {
+        //     Invoke("Step", 1F);
+        // }
     } 
 
 
@@ -256,7 +269,7 @@ public class Piece : MonoBehaviour {
 
 
         //Clear lines
-        //Board.checkBoardForLineClears();
+        Board.checkBoardForLineClears();
 
         print("Checking for game over!");
         //Check for game over
@@ -340,20 +353,25 @@ public class Piece : MonoBehaviour {
     void Step(){
         //print("Making a step");
 
-        //Check if valid for vertical
-        if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations, this)) {
+        //Check if the step is enabled
+        if(!stepEnabled) {
             return;
-        }
+        } else if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations, this)) {
+            //Disable the step
+            stepEnabled = false;
 
 
-        //Move Piece
-        this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
+            return;
+        } else {    //Step is enabled
+            //Move Piece
+            this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
 
 
-        PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
+            PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
         
         
-        CancelInvoke("Step");   
+            CancelInvoke("Step");
+        } 
     }
 
 
