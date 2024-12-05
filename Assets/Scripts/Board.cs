@@ -193,7 +193,7 @@ public class Board : MonoBehaviour
         }
 
         //Update the line cleared counter
-        //lines += rowsToClear.Count; 
+        lines += rowsToClear.Count; 
 
         //Grab the lowest number line cleared (This is the highest up line!!)
         //Bottom of the board is 19 and the top is 0

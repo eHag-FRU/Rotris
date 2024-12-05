@@ -5,10 +5,15 @@ using UnityEngine;
 public class PiecePart_HorizontalMovement : MonoBehaviour
 {
 
-    public static bool validHorizontalMoveChecker(float movementDirectionModifier, List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations) {
+    public static bool validHorizontalMoveChecker(float movementDirectionModifier, List<GameObject> PieceParts, List<Vector2Int> PiecePartLocations, Piece piece) {
             //print("PiecePartLocations: " + PiecePartLocations.ToString());
 
             //Will hold the validity
+
+            //Ensures there is a piece there to move
+            if (piece == null) {
+                return false;
+            }
 
             //Check for each piece location
             foreach (GameObject part in PieceParts) {

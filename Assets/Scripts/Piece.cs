@@ -164,7 +164,7 @@ public class Piece : MonoBehaviour {
         //currentPiece.position = new UnityEngine.Vector2(currentPiece.position.x + movement, currentPiece.position.y);
 
         if (pieceMovement.triggered) {
-            if (!PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
+            if (!PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations, this)) {
                 //Can not keep moving, need to stop moving and handle case
                 
                 //Pick a new piece, locked into place already
@@ -187,12 +187,12 @@ public class Piece : MonoBehaviour {
             //Rotate in increments of 90 deg
             
             //Now check if the rotations would be valid
-            if(PiecePart_RotationMovement.piecePartRotationValidator(currentPiece, PieceParts, PiecePartLocations)) {
-                currentPiece.rotation += 90;
+            // if(PiecePart_RotationMovement.piecePartRotationValidator(currentPiece, PieceParts, PiecePartLocations)) {
+            //     currentPiece.rotation += 90;
 
-                //Update after the rotation
-                PiecePart_RotationMovement.piecePartRotationLocationUpdater(PieceParts, PiecePartLocations);
-            }
+            //     //Update after the rotation
+            //     PiecePart_RotationMovement.piecePartRotationLocationUpdater(PieceParts, PiecePartLocations);
+            // }
             
         }
 
