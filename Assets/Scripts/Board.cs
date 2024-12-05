@@ -282,7 +282,18 @@ public class Board : MonoBehaviour
     }
 
     public static int getPiecePresent(int row, int col) {
-        //Grabs the piece present value based on the row and column
+        print("Trying to find " + ("Tile_"+row+"-"+col));
+
+        //Check the row validity
+        if (row > 19 || row < 0) {
+            return -1;
+        }
+
+       if (col < 0 || col > 9) {
+            return -1;
+       }
+
+        //Grabs the piece present value based on the row and column, piece is present
         return (GameObject.Find(("Tile_"+row+"-"+col))).GetComponent<BackBoardPiece>().piecePresent;
     }
 
@@ -292,6 +303,7 @@ public class Board : MonoBehaviour
             if (getPiecePresent(row, i) == 0) {
                 //No piece present, NOT FULL!
                 return false;
+                //return true;
             }
         }
 

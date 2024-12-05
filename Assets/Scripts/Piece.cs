@@ -58,6 +58,8 @@ public class Piece : MonoBehaviour {
     [SerializeField]
     private GameObject O; 
 
+    [SerializeField]
+    private GameObject Single; 
 
     //Holds the spawn point empty object as a location holder
     [SerializeField]
@@ -87,13 +89,15 @@ public class Piece : MonoBehaviour {
 
     //Piece enum to hold the names
     enum pieceNames {
-        I,
-        T,
-        O,
-        S,
-        Z,
-        J,
-        L
+        //I,
+        //T,
+        //O,
+        //S,
+        //Z,
+        //J,
+        L,
+
+        Single
     }
 
     //Holds the next piece
@@ -209,7 +213,10 @@ public class Piece : MonoBehaviour {
                 //Lock the piece in
                 lockPiece();
 
-                if (!piecePicked) {
+                print("piecePicked?: " + piecePicked);
+
+                //There are no children, it released its piece, now grab a new one
+                if (getChildren(this.gameObject).Count == 0) {
                     //New piece has not been picked, now picking a new piece
                     pickNewPiece();
 
@@ -309,21 +316,31 @@ public class Piece : MonoBehaviour {
         pieceNames randomPiece = (pieceNames)values.GetValue(randomPiecePicker.Next(values.Length));
 
         //DEBUG: REMOVE BEFORE RELEASE!!!!
-        randomPiece = pieceNames.L;
+        //randomPiece = pieceNames.Single;
 
         //print(randomPiece.DisplayName());
         //Now get the piece prefab based oon its name
         switch (randomPiece) {
-            case pieceNames.T:
-                this.currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
+            // case pieceNames.T:
+            //     this.currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
+            //     //print("Instantiate the game object");
+            
+            //     //print("Setting the piece's parent as the piece object");
+            //     currentPiece.transform.parent = this.gameObject.transform;
+            //     break;
+            case pieceNames.L:
+                //print("In the L case");
+                this.currentPiece = Instantiate(L, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
                 //print("Instantiate the game object");
             
                 //print("Setting the piece's parent as the piece object");
                 currentPiece.transform.parent = this.gameObject.transform;
+
+                
                 break;
-            case pieceNames.L:
+            case pieceNames.Single:
                 //print("In the L case");
-                this.currentPiece = Instantiate(L, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
+                this.currentPiece = Instantiate(Single, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
                 //print("Instantiate the game object");
             
                 //print("Setting the piece's parent as the piece object");

@@ -36,13 +36,14 @@ public class PiecePart_VerticalMovement : MonoBehaviour
             //This means its it something else!
 
             foreach(Vector2Int partletLocation in PiecePartLocations) {
+                print(Board.printBoardVectorState());
                 //If in the row + 1 is equal to one of the other pieceparts locations, break
                 //and continue cycling through
                 if (currentPartRow + 1 == partletLocation.x) {
                     //We already found its new position, no need to continue, break!
                     //print("Already found new position that another partlet has");
                     break;
-                } else if (partletLocation == PiecePartLocations[3]) {
+                } else if (partletLocation == PiecePartLocations[(PiecePartLocations.Count - 1)]) {
                     // print(part.name + " location: " + "(" + currentPartRow + "," + currentPartColl + ")");
                     // print(part.name + " one below location: " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")");
                     
@@ -55,7 +56,8 @@ public class PiecePart_VerticalMovement : MonoBehaviour
 
                     // print("Another piece below at " + "(" + (currentPartRow + 1) + "," + currentPartColl + ")" + ": " + pieceBelow);
 
-                    if (pieceBelow == 1) {
+                    //-1 means there is absolutely NO piece that exists, can not even grab the background tile
+                    if (pieceBelow == 1 || pieceBelow == -1) {
                         // print("Hit another piece!");
                         //Need to start lock timer and pick new piece!!
 
@@ -75,6 +77,8 @@ public class PiecePart_VerticalMovement : MonoBehaviour
                     //stepEnabled = false;
 
                     // print("At bottom of board!!!");
+
+                    print(part.name + " at " + currentPartColl + "," + currentPartRow);
 
                     // //lock piece in
                     // Invoke("lockTimer", 0.5f);

@@ -47,7 +47,7 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
                         //We already found its new position, no need to continue, break!
                         //print("Already found new position that another partlet has");
                         break;
-                    } else if (partletLocation == PiecePartLocations[3]) {
+                    } else if (partletLocation == PiecePartLocations[(PiecePartLocations.Count - 1)]) {
                         int newCollPosition = currentPartColl + (int)movementDirectionModifier;
 
                         //At the last location to check!!!
@@ -65,7 +65,8 @@ public class PiecePart_HorizontalMovement : MonoBehaviour
 
                         //print("Another piece to the left or right at " + "(" + currentPartRow + "," + newCollPosition + ")" + ": " + pieceToLeftOrRight);
 
-                        if (pieceToLeftOrRight == 1) {
+                        //-1 means there is not even a piece to the left or right, not even a background tile!!!
+                        if (pieceToLeftOrRight == 1 || pieceToLeftOrRight == -1) {
                             //print("STOP! ANOTHER PIECE IS PRESENT!!!!!");
 
                             return false;
