@@ -1,370 +1,226 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Threading;
-using Unity.VisualScripting;
-using UnityEditor.Animations;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class Piece : MonoBehaviour {
+public class Piece : MonoBehaviour
+{
+    public Board board { get; private set; }
+    public TetrominoData data { get; private set; }
+    public Vector3Int[] cells { get; private set; }
+    public Vector3Int position { get; private set; }
+    public int rotationIndex { get; private set; }
 
-
-    //Timing delays for the movement downward
-    //1F = 1 Second
-    //0.5F = 0.5 Seconds
     public float stepDelay = 1f;
+    public float moveDelay = 0.1f;
+    public float lockDelay = 0.5f;
 
     private float stepTime;
+    private float moveTime;
+    private float lockTime;
 
-    public UnityEngine.Vector3 position;
-
-    public Rigidbody2D currentPiece;
-
-    //Controls for the player
-    public PlayerInput playerInput; 
-
-    //Input actions
-    public InputAction pieceMovement;
-    private InputAction pieceRotation;
-    private InputAction boardRotation;
-    private InputAction softDrop;
-    private InputAction hardDrop;
-    private InputAction hold;
-
-    //
-    //  Holds the piece prefabs
-    //
-
-    [SerializeField]
-    private GameObject T;
-
-    [SerializeField]
-    private GameObject J;
-
-    [SerializeField]
-    private GameObject L;
-
-    [SerializeField]
-    private GameObject Z;
-
-    [SerializeField]
-    private GameObject I;
-
-    [SerializeField]
-    private GameObject S;
-
-    [SerializeField]
-    private GameObject O; 
-
-
-    //Holds the spawn point empty object as a location holder
-    [SerializeField]
-    private GameObject PieceSpawnPoint;
-
-
-
-    //REMOVE for release, used to test the piece picker functionality
-    private InputAction DEBUG_PIECE_RELEASE;
-
-    //REMOVE for release, used to test the lock timer functionality
-    private InputAction DEBUG_LOCK_TIMER;
-
-    //Smaller blocks that make up the piece locations
-    //and gameobjects
-
-    [SerializeField]
-    private List<GameObject> PieceParts;
-
-
-    private List<Vector2Int> PiecePartLocations;
-
-    //Used for DEBUGGING
-    [SerializeField]
-    private bool stepEnabled = false;
-
-
-    //Piece enum to hold the names
-    enum pieceNames {
-        I,
-        T,
-        O,
-        S,
-        Z,
-        J,
-        L
-    }
-
-    //Holds the next piece
-    private pieceNames nextPiece;
-
-     //helps ensure that a new piece is not picked multiple times
-     bool piecePicked = false;
-
-
-
-    // Start is called before the first frame update
-    void Start()
+    public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
-        //Grab the prefab
-        //prefab = GetComponentInChildren<GameObject>();
+        this.data = data;
+        this.board = board;
+        this.position = position;
 
-        //Platform independent
-        this.stepTime = Time.time + this.stepDelay;
+        rotationIndex = 0;
+        stepTime = Time.time + stepDelay;
+        moveTime = Time.time + moveDelay;
+        lockTime = 0f;
 
-        //Grab player input system
-        playerInput = GetComponent<PlayerInput>();
-
-    
-
-        //Grab actions from the playerInput mapping
-        pieceMovement = playerInput.actions["PieceMovement"];
-        pieceMovement.Enable();
-
-        //print(horizMovement.ToString());
-
-        pieceRotation = playerInput.actions["PieceRotation"];
-        pieceRotation.Enable();
-        
-
-        boardRotation = playerInput.actions["BoardRotation"];
-        softDrop = playerInput.actions["SoftDrop"];
-        hardDrop = playerInput.actions["HardDrop"];
-        hold = playerInput.actions["Hold"];
-        DEBUG_PIECE_RELEASE = playerInput.actions["DEBUG_RELEAESE_PIECE"];
-        DEBUG_LOCK_TIMER = playerInput.actions["DEBUG_LOCK_TIMER"];
-
-
-        //Grab the current piece to control, the piece prefab is a child to the piece object
-        //This allows for movement of each piece and release for the next piece
-        currentPiece = GetComponentInChildren<Rigidbody2D>();
-
-
-        //Setup the current piece part list
-        //0 will ALWAYS be the current piece!!!!
-        PieceParts = getChildren(this.transform.GetChild(0).gameObject);
-
-        // List<GameObject> pieceParts = getChildren(this.transform.GetChild(0).gameObject);
-
-        PiecePartLocations  = new List<Vector2Int>();
-
-        //Grab the part locations 
-        for (int part = 0; part < PieceParts.Count; ++part) {
-            PiecePartLocations.Add(PieceParts[part].GetComponent<PiecePart_Location>().getPartLocation());
+        if (cells == null) {
+            cells = new Vector3Int[data.cells.Length];
         }
 
-        //Sorts the part locations so the largest is on the bottom and the last location checked
-        //PiecePartLocations.Sort();
-
+        for (int i = 0; i < cells.Length; i++) {
+            cells[i] = (Vector3Int)data.cells[i];
+        }
     }
-    // Update is called once per frame
-    void Update(){
-        //Update the current piece position
-        //currentPiece.position = new UnityEngine.Vector2(currentPiece.position.x + movement, currentPiece.position.y);
 
-        if (pieceMovement.triggered) {
-            if (!PiecePart_HorizontalMovement.validHorizontalMoveChecker(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations)) {
-                //Can not keep moving, need to stop moving and handle case
-                
-                //Pick a new piece, locked into place already
-                //pickNewPiece();
-                
-               
-            } else {
+    private void Update()
+    {
+        board.Clear(this);
 
-                //Valid, so move the piece down
-                currentPiece.position= new UnityEngine.Vector2(currentPiece.position.x + pieceMovement.ReadValue<float>() * 2,
-                currentPiece.position.y);
+        // We use a timer to allow the player to make adjustments to the piece
+        // before it locks in place
+        lockTime += Time.deltaTime;
 
-                PiecePart_HorizontalMovement.piecePartHorizontalLocationUpdater(pieceMovement.ReadValue<float>(), PieceParts, PiecePartLocations);
+        // Handle rotation
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            Rotate(-1);
+        } else if (Input.GetKeyDown(KeyCode.E)) {
+            Rotate(1);
+        }
+
+        // Handle hard drop
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            HardDrop();
+        }
+
+        // Allow the player to hold movement keys but only after a move delay
+        // so it does not move too fast
+        if (Time.time > moveTime) {
+            HandleMoveInputs();
+        }
+
+        // Advance the piece to the next row every x seconds
+        if (Time.time > stepTime) {
+            Step();
+        }
+
+        board.Set(this);
+    }
+
+    private void HandleMoveInputs()
+    {
+        // Soft drop movement
+        if (Input.GetKey(KeyCode.S))
+        {
+            if (Move(Vector2Int.down)) {
+                // Update the step time to prevent double movement
+                stepTime = Time.time + stepDelay;
             }
         }
 
+        // Left/right movement
+        if (Input.GetKey(KeyCode.A)) {
+            Move(Vector2Int.left);
+        } else if (Input.GetKey(KeyCode.D)) {
+            Move(Vector2Int.right);
+        }
+    }
 
-        //Rotation check
-        if (pieceRotation.triggered) {
-            //Rotate in increments of 90 deg
-            
-            //Now check if the rotations would be valid
-            if(PiecePart_RotationMovement.piecePartRotationValidator(currentPiece, PieceParts, PiecePartLocations)) {
-                currentPiece.rotation += 90;
+    private void Step()
+    {
+        stepTime = Time.time + stepDelay;
 
-                //Update after the rotation
-                PiecePart_RotationMovement.piecePartRotationLocationUpdater(PieceParts, PiecePartLocations);
+        // Step down to the next row
+        Move(Vector2Int.down);
+
+        // Once the piece has been inactive for too long it becomes locked
+        if (lockTime >= lockDelay) {
+            Lock();
+        }
+    }
+
+    private void HardDrop()
+    {
+        while (Move(Vector2Int.down)) {
+            continue;
+        }
+
+        Lock();
+    }
+
+    private void Lock()
+    {
+        board.Set(this);
+        board.ClearLines();
+        board.SpawnPiece();
+    }
+
+    private bool Move(Vector2Int translation)
+    {
+        Vector3Int newPosition = position;
+        newPosition.x += translation.x;
+        newPosition.y += translation.y;
+
+        bool valid = board.IsValidPosition(this, newPosition);
+
+        // Only save the movement if the new position is valid
+        if (valid)
+        {
+            position = newPosition;
+            moveTime = Time.time + moveDelay;
+            lockTime = 0f; // reset
+        }
+
+        return valid;
+    }
+
+    private void Rotate(int direction)
+    {
+        // Store the current rotation in case the rotation fails
+        // and we need to revert
+        int originalRotation = rotationIndex;
+
+        // Rotate all of the cells using a rotation matrix
+        rotationIndex = Wrap(rotationIndex + direction, 0, 4);
+        ApplyRotationMatrix(direction);
+
+        // Revert the rotation if the wall kick tests fail
+        if (!TestWallKicks(rotationIndex, direction))
+        {
+            rotationIndex = originalRotation;
+            ApplyRotationMatrix(-direction);
+        }
+    }
+
+    private void ApplyRotationMatrix(int direction)
+    {
+        float[] matrix = Data.RotationMatrix;
+
+        // Rotate all of the cells using the rotation matrix
+        for (int i = 0; i < cells.Length; i++)
+        {
+            Vector3 cell = cells[i];
+
+            int x, y;
+
+            switch (data.tetromino)
+            {
+                case Tetromino.I:
+                case Tetromino.O:
+                    // "I" and "O" are rotated from an offset center point
+                    cell.x -= 0.5f;
+                    cell.y -= 0.5f;
+                    x = Mathf.CeilToInt((cell.x * matrix[0] * direction) + (cell.y * matrix[1] * direction));
+                    y = Mathf.CeilToInt((cell.x * matrix[2] * direction) + (cell.y * matrix[3] * direction));
+                    break;
+
+                default:
+                    x = Mathf.RoundToInt((cell.x * matrix[0] * direction) + (cell.y * matrix[1] * direction));
+                    y = Mathf.RoundToInt((cell.x * matrix[2] * direction) + (cell.y * matrix[3] * direction));
+                    break;
             }
-            
+
+            cells[i] = new Vector3Int(x, y, 0);
         }
+    }
 
-        //Soft Drop
-        if (softDrop.triggered) {
-            //Move the piece down by one
+    private bool TestWallKicks(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
 
-            if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations, this)) {
-                print("Hit bottom of board or piece");
+        for (int i = 0; i < data.wallKicks.GetLength(1); i++)
+        {
+            Vector2Int translation = data.wallKicks[wallKickIndex, i];
 
-                //Disable the step
-                stepEnabled = false;
-
-                //Pick a new piece
-                //pickNewPiece();
-
-
-        
-    
-            } else {
-                //True, can move down
-                this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
-            
-                PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
-
-                //Update the score by one
-                Board.updateScore(1);
+            if (Move(translation)) {
+                return true;
             }
         }
 
-        //DEBUG: Force release of a piece to test spawn points
-        if (DEBUG_PIECE_RELEASE.triggered) {
-            print("DEBUG: Piece Release triggered!!");
-
-            //Spawn a new piece onto the board
-            pickNewPiece();
-        }
-
-        //DEBUG: Force the lock timer
-        if (DEBUG_LOCK_TIMER.triggered) {
-            print("DEBUG: LOCK TIMER triggered!!");
-
-            lockPiece();
-            //Lock timer every 0.5 seconds
-            //Invoke("lockTimer", 0.5f);
-        }
-
-        if (stepEnabled) {
-            Invoke("Step", 1F);
-        }
-    } 
-
-
-    //Will hit at 0.5 seconds
-    public void lockPiece() {
-        //Detach the piece from the player controller
-        this.transform.DetachChildren();
-
-        //Set the current piece to none to remove rotations
-        this.currentPiece = null;
-
-
-        //Clear lines
-        //Board.checkBoardForLineClears();
-
-        print("Checking for game over!");
-        //Check for game over
-        Board.checkForGameOver();
-
-        //Cancel out the invoke
-        //CancelInvoke("locktimer");
+        return false;
     }
 
-    void calculateHardDrop() {
-        //Take each piece location and check the least furthest that can go down
-        //The least will be what can actually go
-        int shortestDropDistance = 0;
+    private int GetWallKickIndex(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = rotationIndex * 2;
 
-        print("calculating hard drop distance");
-
-        //Find the lowest point
-        Vector<Vector<int>> lowestPoints;
-
-        //Cycle through them to find the lowest points
-
-
-    }
-
-
-    void pickNewPiece() {
-        //Grab the enum of piece names
-        Array values = Enum.GetValues(typeof(pieceNames));
-
-        //Makes a random generator
-        System.Random randomPiecePicker = new System.Random();
-
-        // print((pieceNames)values.GetValue());
-
-        //Grabs the random piece name
-        //print("Next Random Value: " + randomPiecePicker.Next(values.Length));
-        pieceNames randomPiece = (pieceNames)values.GetValue(randomPiecePicker.Next(values.Length));
-
-        //DEBUG: REMOVE BEFORE RELEASE!!!!
-        randomPiece = pieceNames.L;
-
-        //print(randomPiece.DisplayName());
-        //Now get the piece prefab based oon its name
-        switch (randomPiece) {
-            case pieceNames.T:
-                this.currentPiece = Instantiate(T, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
-                //print("Instantiate the game object");
-            
-                //print("Setting the piece's parent as the piece object");
-                currentPiece.transform.parent = this.gameObject.transform;
-                break;
-            case pieceNames.L:
-                //print("In the L case");
-                this.currentPiece = Instantiate(L, PieceSpawnPoint.transform.position, UnityEngine.Quaternion.identity).GetComponent<Rigidbody2D>();
-                //print("Instantiate the game object");
-            
-                //print("Setting the piece's parent as the piece object");
-                currentPiece.transform.parent = this.gameObject.transform;
-
-                
-                break;
+        if (rotationDirection < 0) {
+            wallKickIndex--;
         }
 
-        //Signal to the board that the row check is to happen, and full rows are to be cleared
-        //Board.checkBoardForLineClears();
-
-        //Now enable the step for it to move down the board
-        this.stepEnabled =  true;
-
-        //Reset the part piece locations
-        this.PiecePartLocations.Clear();
-
-        //Now set the piece part list
-        this.PieceParts = getChildren(this.transform.GetChild(0).gameObject);
-
-        //print("Name of next piece picked: " + randomPiece.DisplayName());
+        return Wrap(wallKickIndex, 0, data.wallKicks.GetLength(0));
     }
 
-       
-
-    void Step(){
-        //print("Making a step");
-
-        //Check if valid for vertical
-        if (!PiecePart_VerticalMovement.validVerticalMoveChecker(PieceParts, PiecePartLocations, this)) {
-            return;
+    private int Wrap(int input, int min, int max)
+    {
+        if (input < min) {
+            return max - (min - input) % (max - min);
+        } else {
+            return min + (input - min) % (max - min);
         }
-
-
-        //Move Piece
-        this.transform.position = new UnityEngine.Vector3(this.transform.position.x, this.transform.position.y - 2, this.transform.position.z );
-
-
-        PiecePart_VerticalMovement.piecePartVetricalLocationUpdater(PieceParts, PiecePartLocations);
-        
-        
-        CancelInvoke("Step");   
     }
 
-
-    //Will grab all the children piece parts for the positions to be grabbed of the current active piece
-    List<GameObject> getChildren(GameObject parent) {
-        List<GameObject> result = new List<GameObject>();
-
-        for (int currentChild = 0; currentChild < parent.transform.childCount; ++currentChild) {
-            result.Add(parent.transform.GetChild(currentChild).gameObject);
-        }
-
-        return result;
-    }
 }

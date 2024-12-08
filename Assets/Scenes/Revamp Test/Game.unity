@@ -738,56 +738,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402a0bbcef77f4a73a49a32f17df4a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tetrominoes:
-  - tetromino: 0
-    tile: {fileID: 11400000, guid: af923976e00dc40419d63e7869a3b1cf, type: 2}
-    cells:
-    - {x: -1, y: 1}
-    - {x: 0, y: 1}
-    - {x: 1, y: 1}
-    - {x: 2, y: 1}
-  - tetromino: 3
-    tile: {fileID: 11400000, guid: 1beb7ed558c904a879a05e90c378075c, type: 2}
-    cells:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-  - tetromino: 4
-    tile: {fileID: 11400000, guid: 15a5c9642ea314764a61457d1227ce98, type: 2}
-    cells:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-  - tetromino: 1
-    tile: {fileID: 11400000, guid: c3ced429090374792813f8d54bc8f13a, type: 2}
-    cells:
-    - {x: -1, y: 1}
-    - {x: -1, y: 0}
-    - {x: 0, y: 0}
-    - {x: 1, y: 0}
-  - tetromino: 5
-    tile: {fileID: 11400000, guid: 1770f1755cad648059a930f0689c6d6e, type: 2}
-    cells:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-  - tetromino: 2
-    tile: {fileID: 11400000, guid: c2f0e4e09070f4ef3b3154b4613675d7, type: 2}
-    cells:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-  - tetromino: 6
-    tile: {fileID: 11400000, guid: d35bdabcbdd274f14920094270fa5474, type: 2}
-    cells:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
 --- !u!156049354 &1688514914
 Grid:
   m_ObjectHideFlags: 0
