@@ -1,6 +1,5 @@
 // JellyTetris.cs
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 public class JellyTetris : MonoBehaviour
@@ -35,6 +34,13 @@ public class JellyTetris : MonoBehaviour
     [Tooltip("Delay before checking and clearing rows after a tetromino locks in place.")]
     public float settleDelay = 1f;
 
+    [Header("Glow Settings")]
+    [Tooltip("Duration for which blocks glow before being cleared.")]
+    public float glowDuration = 0.5f;
+
+    [Tooltip("Color to apply to blocks when they glow.")]
+    public Color glowColor = Color.yellow;
+
     private Collider2D[][] rowBlockArrays; // Each row contains an array of colliders
     private bool isGameOver = false;
     private bool isCheckingRows = false;
@@ -62,19 +68,51 @@ public class JellyTetris : MonoBehaviour
 
         if (rowIndex >= 0 && rowIndex < totalRows)
         {
-            rowBlockArrays[rowIndex] = rowBlockArrays[rowIndex].Append(blockCollider).ToArray();
+            // Create a new array with one additional slot
+            Collider2D[] newRow = new Collider2D[rowBlockArrays[rowIndex].Length + 1];
+            for (int i = 0; i < rowBlockArrays[rowIndex].Length; i++)
+            {
+                newRow[i] = rowBlockArrays[rowIndex][i];
+            }
+            newRow[newRow.Length - 1] = blockCollider;
+            rowBlockArrays[rowIndex] = newRow;
 
             // If the row is immediately full, we won't clear it right away.
             // It will be cleared during the scheduled settle check.
         }
     }
 
-    private void ClearRow(int rowIndex)
+    private IEnumerator ClearRowCoroutine(Collider2D[] rowBlocks)
     {
-        Debug.Log($"[JellyTetris] Clearing row: {rowIndex}");
+        // Apply glow to all blocks in the row
+        foreach (var block in rowBlocks)
+        {
+            if (block != null && block.gameObject.CompareTag("Block"))
+            {
+                SpriteRenderer sr = block.GetComponent<SpriteRenderer>();
+                if (sr != null && sr.material.HasProperty("_EmissionColor"))
+                {
+                    sr.material.EnableKeyword("_EMISSION");
+                    sr.material.SetColor("_EmissionColor", glowColor);
+                }
+                else if (sr != null)
+                {
+                    sr.color = glowColor; // Fallback if emission is not available
+                }
+                else
+                {
+                    Debug.LogWarning("Block missing SpriteRenderer for glow.");
+                }
+            }
+        }
 
-        // Destroy all blocks in the row
-        foreach (var block in rowBlockArrays[rowIndex])
+        // Wait for the glow duration
+        yield return new WaitForSeconds(glowDuration);
+
+        // Proceed to destroy the blocks
+        float clearedRowY = rowBlocks[0].transform.position.y;
+
+        foreach (var block in rowBlocks)
         {
             if (block != null && block.gameObject.CompareTag("Block"))
             {
@@ -82,7 +120,90 @@ public class JellyTetris : MonoBehaviour
             }
         }
 
-        rowBlockArrays[rowIndex] = new Collider2D[0]; // Reset the row
+        EnableSimulationAboveRow(clearedRowY);
+        Debug.Log("[JellyTetris] Row cleared.");
+    }
+
+    private IEnumerator SettleAndClearRows()
+    {
+        isCheckingRows = true;
+        yield return new WaitForSeconds(settleDelay);
+
+        Debug.Log($"[JellyTetris] Blocks required per row to clear: {blocksPerRow}");
+
+        // Iterate through each row to check for clearing
+        for (int rowIndex = 0; rowIndex < totalRows; rowIndex++)
+        {
+            float rowY = startY + rowIndex * rowHeight;
+
+            // Collect all colliders in the current row's check range
+            Collider2D[] allRowColliders = Physics2D.OverlapBoxAll(
+                new Vector2(0, rowY),
+                new Vector2(rowWidth, rowCheckHeight),
+                0f
+            );
+
+            // Manually filter colliders to include only those with the "Block" tag
+            int blockCount = 0;
+            Collider2D[] rowBlocksTemp = new Collider2D[allRowColliders.Length];
+            int tempIndex = 0;
+
+            for (int i = 0; i < allRowColliders.Length; i++)
+            {
+                if (allRowColliders[i].CompareTag("Block"))
+                {
+                    rowBlocksTemp[tempIndex] = allRowColliders[i];
+                    blockCount++;
+                    tempIndex++;
+                }
+            }
+
+            // Resize the array to the actual number of blocks
+            Collider2D[] rowBlocks = new Collider2D[blockCount];
+            for (int i = 0; i < blockCount; i++)
+            {
+                rowBlocks[i] = rowBlocksTemp[i];
+            }
+
+            Debug.Log($"[JellyTetris] Row {rowIndex} at {rowY} contains {rowBlocks.Length} blocks with tag 'Block'.");
+
+            // Clear the row if the block count meets or exceeds the threshold
+            if (rowBlocks.Length >= blocksPerRow)
+            {
+                Debug.Log($"[JellyTetris] Clearing row at height: {rowY}");
+                yield return StartCoroutine(ClearRowCoroutine(rowBlocks));
+                // After clearing, blocks above will settle due to gravity
+            }
+        }
+
+        // If the game isn't over, spawn a new Tetromino
+        if (!isGameOver)
+            SpawnTetromino();
+
+        isCheckingRows = false;
+    }
+
+    private void EnableSimulationAboveRow(float clearedRowY)
+    {
+        Rigidbody2D[] allRigidbodies = FindObjectsOfType<Rigidbody2D>();
+        foreach (Rigidbody2D rb in allRigidbodies)
+        {
+            if (rb.CompareTag("Block") && rb.transform.position.y > clearedRowY)
+            {
+                rb.simulated = true;
+            }
+        }
+    }
+
+    private Tetromino GetActiveTetromino()
+    {
+        Tetromino[] allTetrominoes = FindObjectsOfType<Tetromino>();
+        foreach (Tetromino t in allTetrominoes)
+        {
+            if (!t.IsLocked)
+                return t;
+        }
+        return null;
     }
 
     private void Update()
@@ -154,6 +275,7 @@ public class JellyTetris : MonoBehaviour
             {
                 Debug.LogError("GameOver: A block locked out of bounds!");
                 isGameOver = true;
+                HandleGameOver();
                 return;
             }
         }
@@ -165,80 +287,39 @@ public class JellyTetris : MonoBehaviour
         }
     }
 
-    private IEnumerator SettleAndClearRows()
+    private void HandleGameOver()
+{
+    Debug.Log("[JellyTetris] Game Over!");
+
+    // Optionally, display a Game Over UI, stop the game, etc.
+    // Example: Time.timeScale = 0f;
+
+    // Destroy all active blocks from rowBlockArrays
+    foreach (Collider2D[] row in rowBlockArrays)
     {
-        isCheckingRows = true;
-        yield return new WaitForSeconds(settleDelay);
-
-        Debug.Log($"[JellyTetris] Blocks required per row to clear: {blocksPerRow}");
-
-        // Check each row line by line after the delay
-        for (int rowIndex = 0; rowIndex < totalRows; rowIndex++)
+        if (row != null)
         {
-            float rowY = startY + rowIndex * rowHeight;
-
-            // Collect all colliders in the current row check range
-            Collider2D[] rowBlocks = Physics2D.OverlapBoxAll(
-                new Vector2(0, rowY),
-                new Vector2(rowWidth, rowCheckHeight),
-                0f
-            );
-
-            Debug.Log($"[JellyTetris] Row {rowIndex} at {rowY} contains {rowBlocks.Length} blocks.");
-
-            // Clear the row if the block count meets or exceeds the threshold
-            if (rowBlocks.Length >= blocksPerRow)
+            foreach (Collider2D collider in row)
             {
-                Debug.Log($"[JellyTetris] Clearing row at height: {rowY}");
-                ClearRow(rowBlocks);
-                // After clearing, we can let the blocks above settle again, or just continue clearing.
-                // They will settle due to gravity.
-            }
-        }
-
-        // If the game isn't over, spawn a new Tetromino
-        if (!isGameOver)
-            SpawnTetromino();
-
-        isCheckingRows = false;
-    }
-
-    private void ClearRow(Collider2D[] rowBlocks)
-    {
-        float clearedRowY = rowBlocks[0].transform.position.y;
-
-        foreach (var block in rowBlocks)
-        {
-            if (block.gameObject.CompareTag("Block"))
-            {
-                Destroy(block.gameObject);
-            }
-        }
-
-        EnableSimulationAboveRow(clearedRowY);
-        Debug.Log("[JellyTetris] Row cleared.");
-    }
-
-    private void EnableSimulationAboveRow(float clearedRowY)
-    {
-        foreach (Rigidbody2D blockRb in FindObjectsOfType<Rigidbody2D>())
-        {
-            if (blockRb.CompareTag("Block") && blockRb.transform.position.y > clearedRowY)
-            {
-                blockRb.simulated = true;
+                if (collider != null)
+                {
+                    Destroy(collider.gameObject);
+                }
             }
         }
     }
 
-    private Tetromino GetActiveTetromino()
+    // Additionally, destroy all blocks tagged as "Block" in the scene
+    Collider2D[] allBlocks = FindObjectsOfType<Collider2D>();
+    foreach (Collider2D block in allBlocks)
     {
-        Tetromino[] allTetrominoes = FindObjectsOfType<Tetromino>();
-        foreach (var t in allTetrominoes)
+        if (block.CompareTag("Block"))
         {
-            if (!t.IsLocked) return t;
+            Destroy(block.gameObject);
         }
-        return null;
     }
+}
+
 
     private void OnDrawGizmos()
     {

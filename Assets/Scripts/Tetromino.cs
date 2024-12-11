@@ -1,6 +1,5 @@
 // Tetromino.cs
 using UnityEngine;
-using System.Linq;
 using System.Collections;
 
 public class Tetromino : MonoBehaviour
@@ -13,75 +12,174 @@ public class Tetromino : MonoBehaviour
     public float jellyScaleRange = 0.05f;
     public float lockDelay = 0.2f;
 
+    [Header("Rotation Settings")]
+    [Tooltip("Time in seconds to complete a rotation.")]
+    public float rotationDuration = 0.3f;
+
+    [Header("Jelly Joint Settings")]
+    [Tooltip("Spring constant for the joints.")]
+    public float spring = 50f;
+
+    [Tooltip("Damping ratio for the joints.")]
+    public float damping = 5f;
+
+    [Tooltip("Maximum distance allowed between connected blocks.")]
+    public float distance = 0.5f;
+
     private BoxCollider2D[] blockColliders;
     private bool collided = false;
     private bool lockTimerStarted = false;
+    private bool isRotating = false; // Flag to prevent multiple rotations
+
+    private Rigidbody2D rb;
 
     private void Awake()
     {
-        Blocks = GetComponentsInChildren<Transform>()
-            .Where(t => t != transform)
-            .ToArray();
+        // Initialize Blocks array excluding the parent transform
+        Transform[] allChildren = GetComponentsInChildren<Transform>();
+        int blockCount = 0;
+        foreach (Transform child in allChildren)
+        {
+            if (child != this.transform)
+                blockCount++;
+        }
 
-        blockColliders = Blocks.Select(b => b.GetComponent<BoxCollider2D>())
-                               .Where(col => col != null).ToArray();
+        Blocks = new Transform[blockCount];
+        int index = 0;
+        foreach (Transform child in allChildren)
+        {
+            if (child != this.transform)
+            {
+                Blocks[index] = child;
+                index++;
+            }
+        }
+
+        // Initialize blockColliders array
+        blockColliders = new BoxCollider2D[Blocks.Length];
+        for (int i = 0; i < Blocks.Length; i++)
+        {
+            BoxCollider2D col = Blocks[i].GetComponent<BoxCollider2D>();
+            if (col != null)
+            {
+                blockColliders[i] = col;
+            }
+            else
+            {
+                // Optionally, add a BoxCollider2D if missing
+                col = Blocks[i].gameObject.AddComponent<BoxCollider2D>();
+                blockColliders[i] = col;
+            }
+        }
+
+        // Initialize Rigidbody2D
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        }
+
+        // Initialize joints between blocks
+        InitializeJoints();
     }
 
     public void Initialize(float gravityScale, PhysicsMaterial2D blockPhysicsMaterial = null)
     {
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb == null) rb = gameObject.AddComponent<Rigidbody2D>();
-
         rb.isKinematic = false;
         rb.gravityScale = gravityScale;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.bodyType = RigidbodyType2D.Dynamic;
-        if (blockPhysicsMaterial != null) rb.sharedMaterial = blockPhysicsMaterial;
+        rb.freezeRotation = false; // Allow rotation
+
+        if (blockPhysicsMaterial != null)
+            rb.sharedMaterial = blockPhysicsMaterial;
 
         Debug.Log("[Tetromino] Initialized with properties.");
+    }
+
+    private void InitializeJoints()
+    {
+        // Ensure all blocks have Rigidbody2D components
+        foreach (var block in Blocks)
+        {
+            Rigidbody2D blockRb = block.GetComponent<Rigidbody2D>();
+            if (blockRb == null)
+            {
+                blockRb = block.gameObject.AddComponent<Rigidbody2D>();
+                blockRb.bodyType = RigidbodyType2D.Dynamic;
+                blockRb.gravityScale = rb.gravityScale;
+                blockRb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+                blockRb.freezeRotation = false;
+            }
+        }
+
+        // Connect each block to its immediate neighbors
+        for (int i = 0; i < Blocks.Length; i++)
+        {
+            for (int j = i + 1; j < Blocks.Length; j++)
+            {
+                float currentDistance = Vector3.Distance(Blocks[i].localPosition, Blocks[j].localPosition);
+                if (currentDistance <= 1.0f) // Adjust this threshold based on block arrangement
+                {
+                    SpringJoint2D joint = Blocks[i].gameObject.AddComponent<SpringJoint2D>();
+                    Rigidbody2D connectedRb = Blocks[j].GetComponent<Rigidbody2D>();
+
+                    joint.connectedBody = connectedRb;
+                    joint.autoConfigureDistance = false;
+                    joint.distance = distance;
+                    joint.frequency = spring;
+                    joint.dampingRatio = damping;
+
+                    // Optionally, adjust joint break force or other properties
+                     joint.breakForce = 1000;
+                     joint.breakTorque = 1000;
+                }
+            }
+        }
     }
 
     public void TryMove(Vector3 direction)
     {
         if (IsLocked) return;
 
-        // Apply movement
-        Vector3 newPosition = transform.position + direction;
-
-        // Clamp the new position within the boundaries
-        newPosition.x = Mathf.Clamp(newPosition.x, -4f, 4f);
-        newPosition.y = Mathf.Clamp(newPosition.y, -9f, 9f);
-
-        // Update position
-        transform.position = newPosition;
+        // Apply movement using Rigidbody2D for physics-based movement
+        rb.MovePosition(rb.position + (Vector2)direction);
     }
 
     public void TryRotate(float angle)
     {
-        if (IsLocked) return;
+        if (IsLocked || isRotating) return;
 
-        // Save the original rotation
-        Quaternion originalRotation = transform.rotation;
-        transform.Rotate(0, 0, angle);
-
-        if (!IsValidPosition())
-        {
-            // If rotation is invalid, try shifting horizontally
-            if (TryShift(Vector3.right) || TryShift(Vector3.left))
-            {
-                return; // If shifting works, keep the rotation
-            }
-            transform.rotation = originalRotation; // Revert rotation if no shift works
-        }
+        // Start a coroutine to rotate smoothly
+        StartCoroutine(RotateOverTime(angle));
     }
 
-    private bool TryShift(Vector3 direction)
+    private IEnumerator RotateOverTime(float angle)
     {
-        transform.position += direction;
-        if (IsValidPosition()) return true;
+        isRotating = true;
 
-        transform.position -= direction; // Revert shift
-        return false;
+        float elapsed = 0f;
+        float startRotation = rb.rotation;
+        float endRotation = startRotation + angle;
+
+        while (elapsed < rotationDuration)
+        {
+            float newRotation = Mathf.Lerp(startRotation, endRotation, elapsed / rotationDuration);
+            rb.MoveRotation(newRotation);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        rb.MoveRotation(endRotation);
+
+        // Check if the new rotation is valid
+        if (!IsValidPosition())
+        {
+            // If invalid, revert rotation
+            rb.MoveRotation(startRotation);
+        }
+
+        isRotating = false;
     }
 
     private bool IsValidPosition()
@@ -95,6 +193,9 @@ public class Tetromino : MonoBehaviour
             {
                 return false;
             }
+
+            // Additional collision checks can be implemented here
+            // For example, check if the block overlaps with existing blocks
         }
         return true;
     }
@@ -139,10 +240,56 @@ public class Tetromino : MonoBehaviour
     {
         Debug.Log("[Tetromino] Applying jelly drop effect.");
         float randomRotation = Random.Range(-jellyRotationRange, jellyRotationRange);
-        transform.Rotate(0, 0, randomRotation);
+        StartCoroutine(RotateJellyDrop(randomRotation));
 
         float scaleChange = 1.0f + Random.Range(-jellyScaleRange, jellyScaleRange);
-        transform.localScale *= scaleChange;
+        StartCoroutine(ScaleJellyDrop(scaleChange));
+    }
+
+    private IEnumerator RotateJellyDrop(float angle)
+    {
+        float elapsed = 0f;
+        float duration = 0.2f; // Duration for jelly rotation effect
+        float startRotation = rb.rotation;
+        float endRotation = startRotation + angle;
+
+        while (elapsed < duration)
+        {
+            float newRotation = Mathf.Lerp(startRotation, endRotation, elapsed / duration);
+            rb.MoveRotation(newRotation);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        rb.MoveRotation(endRotation);
+    }
+
+    private IEnumerator ScaleJellyDrop(float scaleChange)
+    {
+        Vector3 originalScale = transform.localScale;
+        Vector3 targetScale = originalScale * scaleChange;
+        float elapsed = 0f;
+        float duration = 0.2f;
+
+        while (elapsed < duration)
+        {
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localScale = targetScale;
+
+        // Revert to original scale
+        elapsed = 0f;
+        while (elapsed < duration)
+        {
+            transform.localScale = Vector3.Lerp(targetScale, originalScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localScale = originalScale;
     }
 
     private void StartLockDelayCountdown()

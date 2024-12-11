@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1476286896297645304}
   - component: {fileID: 5750161979119155760}
   - component: {fileID: 4957473442847126241}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block4
   m_TagString: Block
   m_Icon: {fileID: 0}
@@ -170,7 +170,7 @@ GameObject:
   - component: {fileID: 6113554846486084718}
   - component: {fileID: 5076098068099532887}
   - component: {fileID: 1949392285983778359}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block1
   m_TagString: Block
   m_Icon: {fileID: 0}
@@ -328,7 +328,7 @@ GameObject:
   - component: {fileID: 690078350252254487}
   - component: {fileID: 6866977313896542590}
   - component: {fileID: 7479351970296671886}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block2
   m_TagString: Block
   m_Icon: {fileID: 0}
@@ -486,7 +486,7 @@ GameObject:
   - component: {fileID: 1124891752258108970}
   - component: {fileID: 1622346965526339877}
   - component: {fileID: 6487848937326620793}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block3
   m_TagString: Block
   m_Icon: {fileID: 0}
@@ -645,7 +645,7 @@ GameObject:
   - component: {fileID: 3304188679402372063}
   - component: {fileID: 1427884163705589229}
   - component: {fileID: 2126452334776686221}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: O
   m_TagString: NewPiece
   m_Icon: {fileID: 0}
@@ -726,7 +726,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.95, y: 1.95}
+  m_Size: {x: 1.85, y: 1.85}
   m_EdgeRadius: 0
 --- !u!50 &1427884163705589229
 Rigidbody2D:
@@ -770,3 +770,7 @@ MonoBehaviour:
   jellyRotationRange: 5
   jellyScaleRange: 0.05
   lockDelay: 0.2
+  rotationDuration: 0.03
+  spring: 100
+  damping: 5
+  distance: 1

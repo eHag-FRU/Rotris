@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 1314228833000116986}
   - component: {fileID: 2216695388105890785}
   - component: {fileID: 372255593752894880}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block1 (3)
-  m_TagString: NewPiece
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -170,9 +170,9 @@ GameObject:
   - component: {fileID: 520626201108495765}
   - component: {fileID: 4640668925581679217}
   - component: {fileID: 2817250681718135410}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block1 (2)
-  m_TagString: NewPiece
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -328,9 +328,9 @@ GameObject:
   - component: {fileID: 5310050190548860360}
   - component: {fileID: 6988588153568907589}
   - component: {fileID: 5133639680936130949}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block1 (1)
-  m_TagString: NewPiece
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -486,9 +486,9 @@ GameObject:
   - component: {fileID: 6113554846486084718}
   - component: {fileID: 5076098068099532887}
   - component: {fileID: 1949392285983778359}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Block1
-  m_TagString: NewPiece
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -646,9 +646,9 @@ GameObject:
   - component: {fileID: 1427884163705589229}
   - component: {fileID: 2126452334776686221}
   - component: {fileID: 5250299310566361874}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: O 2
-  m_TagString: Untagged
+  m_TagString: NewPiece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -771,6 +771,10 @@ MonoBehaviour:
   jellyRotationRange: 5
   jellyScaleRange: 0.05
   lockDelay: 0.2
+  rotationDuration: 0.03
+  spring: 100
+  damping: 5
+  distance: 1
 --- !u!61 &5250299310566361874
 BoxCollider2D:
   m_ObjectHideFlags: 0
