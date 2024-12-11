@@ -131,7 +131,7 @@ public class Tetromino : MonoBehaviour
                     joint.dampingRatio = damping;
 
                     // Optionally, adjust joint break force or other properties
-                     joint.breakForce = 1000;
+                     joint.breakForce = 5000;
                      joint.breakTorque = 1000;
                 }
             }

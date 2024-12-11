@@ -143,7 +143,7 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 5
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -301,7 +301,7 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 5
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -459,7 +459,7 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 5
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -617,7 +617,7 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 5
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -645,7 +645,7 @@ GameObject:
   - component: {fileID: 3304188679402372063}
   - component: {fileID: 1427884163705589229}
   - component: {fileID: 2126452334776686221}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: O
   m_TagString: NewPiece
   m_Icon: {fileID: 0}
@@ -740,7 +740,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 5
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -753,7 +753,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!114 &2126452334776686221
 MonoBehaviour:
@@ -767,10 +767,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d3e4bdc9418ee43a7516509a2e593d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jellyRotationRange: 5
-  jellyScaleRange: 0.05
-  lockDelay: 0.2
-  rotationDuration: 0.03
+  horizontalDragSpeed: 8
+  jellyRotationRange: 0
+  jellyScaleRange: 0
+  lockDelay: 0.3
+  rotationDuration: 0.4
   spring: 100
-  damping: 5
+  damping: 10
   distance: 1

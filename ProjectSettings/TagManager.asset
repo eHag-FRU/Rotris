@@ -18,6 +18,9 @@ TagManager:
   - Grid
   - Block
   - ClearZone
+  - RightGrid
+  - LeftGrid
+  - Ground
   layers:
   - Default
   - TransparentFX
@@ -27,8 +30,8 @@ TagManager:
   - UI
   - Player
   - block
-  - 
-  - 
+  - FullPiece
+  - Wall
   - 
   - 
   - 
