@@ -1,3 +1,4 @@
+// TopLine.cs
 using UnityEngine;
 
 public class TopLine : MonoBehaviour
@@ -6,15 +7,15 @@ public class TopLine : MonoBehaviour
     public string blockTag = "Block";
 
     // Reference to Tetris for direct communication
-    private Tetris Tetris;
+    private Tetris tetrisInstance;
 
     private void Start()
     {
         // Find the Tetris instance in the scene
-        Tetris = FindObjectOfType<Tetris>();
-        if (Tetris == null)
+        tetrisInstance = FindObjectOfType<Tetris>();
+        if (tetrisInstance == null)
         {
-            Debug.LogError("[TopLine] No Tetris instance found in the scene!");
+            // Optionally, handle the absence of a Tetris instance
         }
     }
 
@@ -28,21 +29,19 @@ public class TopLine : MonoBehaviour
                 // Ensure the block is locked before checking
                 if (rb.simulated && rb.gravityScale > 0)
                 {
-                    Debug.LogError("[TopLine] Block has reached the Top Line. Game Over!");
-
-                    if (Tetris != null)
+                    if (tetrisInstance != null)
                     {
-                        Tetris.TriggerGameOver();
+                        tetrisInstance.TriggerGameOver();
                     }
                     else
                     {
-                        Debug.LogError("[TopLine] Tetris instance not found. Cannot trigger Game Over.");
+                        // Optionally, handle the absence of a Tetris instance
                     }
                 }
             }
             else
             {
-                Debug.LogWarning("[TopLine] Block without Rigidbody2D collided with Top Line.");
+                // Optionally, handle blocks without Rigidbody2D
             }
         }
     }

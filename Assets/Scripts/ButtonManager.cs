@@ -47,6 +47,41 @@ public class ButtonManager : MonoBehaviour
         SceneManager.LoadScene("CreditScreen");
     }
 
+    public void ReturnToMainMenu()
+    {
+        // Optionally, reset the score
+        PlayerPrefs.SetInt("FinalScore", 0);
+        PlayerPrefs.Save();
+
+        // Play menu music
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.PlayMenuMusic();
+        }
+
+        // Load the Main Menu scene
+        SceneManager.LoadScene("TitleScreen");
+    }
+
+    public void RestartGame()
+    {
+        // Optionally, reset the score
+        PlayerPrefs.SetInt("FinalScore", 0);
+        PlayerPrefs.Save();
+
+        // Play game music
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.PlayGameMusic();
+        }
+
+        // Load the Game scene
+        SceneManager.LoadScene("Game");
+    }
+
+
+
+
     public void QuitGame()
     {
         Application.Quit();

@@ -51,11 +51,14 @@ public class Tetris : MonoBehaviour
     [Header("Fail Line Movement Settings")]
     [Tooltip("Amount the Fail Line moves down when moving down.")]
     [SerializeField]
-    [Range(0.1f, 5f)]
-    private float failLineMoveDownAmount = 1f; // Adjustable in Inspector
+    private float failLineMoveDownAmount = 1.0f;
 
-    private int failLineRowIndex = 0; // Tracks the current row index of the Fail Line
-    private Collider2D[][] rowBlockArrays; // Each row contains an array of colliders
+    [Tooltip("Amount the Fail Line moves up when moving up.")]
+    [SerializeField]
+    private float failLineMoveUpAmount = 1.5f;
+
+    private int failLineRowIndex = 0; 
+    private Collider2D[][] rowBlockArrays;
     private bool isGameOver = false;
     private bool isCheckingRows = false;
 
@@ -171,52 +174,53 @@ public class Tetris : MonoBehaviour
 
     private void MoveFailLineUp()
     {
-        failLineRowIndex = Mathf.Clamp(failLineRowIndex + 1, 0, totalRows - 1);
+        if (failLine == null) return;
+
+        failLineRowIndex = Mathf.Clamp(failLineRowIndex + 1, 0, totalRows);
         Vector3 newPosition = new Vector3(
             failLine.position.x,
-            startY + failLineRowIndex * rowHeight +1, // Moving up by rowHeight
+            failLine.position.y + failLineMoveUpAmount, // Increased upward movement
             failLine.position.z
         );
         failLine.position = newPosition;
         Debug.Log($"[Tetris] Moved Fail Line up to row index: {failLineRowIndex}");
-
-        // Check if Fail Line has reached the top
-        if (failLineRowIndex >= totalRows - 1)
-        {
-            Debug.LogError("[Tetris] Fail Line has reached the top. Game Over!");
-            isGameOver = true;
-            HandleGameOver();
-        }
     }
 
     private void MoveFailLineDown()
     {
-        if (failLine == null) return;
 
-        failLineRowIndex = Mathf.Clamp(failLineRowIndex - 1, 0, totalRows - 1);
+        failLineRowIndex = Mathf.Clamp(failLineRowIndex - 1, 0, totalRows);
         Vector3 newPosition = new Vector3(
             failLine.position.x,
-            startY + failLineRowIndex * rowHeight - failLineMoveDownAmount, // Adjusted downward movement
+            failLine.position.y - failLineMoveDownAmount, // Reduced downward movement
             failLine.position.z
         );
         failLine.position = newPosition;
         Debug.Log($"[Tetris] Moved Fail Line down by {failLineMoveDownAmount} to row index: {failLineRowIndex}");
 
-        // Check if Fail Line has reached the top
-        if (failLineRowIndex >= totalRows - 1)
+        // Adjust music pitch when fail line moves down
+        MusicChangeFailLine();
+    }
+
+    private void MusicChangeFailLine()
+    {
+        if (MusicManager.Instance != null)
         {
-            Debug.LogError("[Tetris] Fail Line has reached the top. Game Over!");
-            isGameOver = true;
-            HandleGameOver();
+            MusicManager.Instance.IncreasePitch(0.01f); // Increase pitch by 0.0
+        }
+        else
+        {
+            Debug.LogError("[Tetris] MusicManager instance not found!");
         }
     }
+
 
     private IEnumerator SettleAndClearRows()
     {
         isCheckingRows = true;
-        yield return new WaitForSeconds(settleDelay);
 
-        Debug.Log($"[Tetris] Blocks required per row to clear: {blocksPerRow}");
+        // Wait for 1 second before checking lines
+        yield return new WaitForSeconds(1f); // 1-second delay before line checking
 
         bool anyRowCleared = false;
 
@@ -254,16 +258,13 @@ public class Tetris : MonoBehaviour
                 rowBlocks[i] = rowBlocksTemp[i];
             }
 
-            Debug.Log($"[Tetris] Row {rowIndex} at {rowY} contains {rowBlocks.Length} blocks with tag 'Block'.");
-
             // Clear the row if the block count meets or exceeds the threshold
             if (rowBlocks.Length >= blocksPerRow)
             {
-                Debug.Log($"[Tetris] Clearing row at height: {rowY}");
                 yield return StartCoroutine(ClearRowCoroutine(rowBlocks));
                 anyRowCleared = true;
                 MoveFailLineUp(); // Move Fail Line up when a row is cleared
-                // After clearing, blocks above will settle due to gravity
+                                  // After clearing, blocks above will settle due to gravity
             }
         }
 
@@ -273,14 +274,19 @@ public class Tetris : MonoBehaviour
             MoveFailLineDown(); // Move Fail Line down if no rows were cleared
         }
 
-        // If the game isn't over, spawn a new Tetromino
+        // Delay spawning the new Tetromino by 1 second after clearing lines
+        yield return new WaitForSeconds(1f); // 1-second delay before spawning
+
+        // Spawn the new Tetromino
         if (!isGameOver)
+        {
             SpawnTetromino();
+        }
 
         isCheckingRows = false;
     }
 
-    private void EnableSimulationAboveRow(float clearedRowY)
+private void EnableSimulationAboveRow(float clearedRowY)
     {
         Rigidbody2D[] allRigidbodies = FindObjectsOfType<Rigidbody2D>();
         foreach (Rigidbody2D rb in allRigidbodies)
@@ -379,7 +385,6 @@ public class Tetris : MonoBehaviour
         {
             if (block.position.y > endY)
             {
-                Debug.LogError("GameOver: A block locked out of bounds!");
                 isGameOver = true;
                 HandleGameOver();
                 return;
@@ -410,9 +415,28 @@ public class Tetris : MonoBehaviour
         PlayerPrefs.SetInt("FinalScore", Score);
         PlayerPrefs.Save();
 
+
+
+
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.PlayMenuMusic(); // 2-second fade duration
+        }
+        else
+        {
+            Debug.LogError("[Tetris] MusicManager instance not found!");
+        }
+        // Optionally, delay scene change to allow music transition
+        StartCoroutine(LoadGameOverScene(1f)); // Match fade duration
+    }
+
+    private IEnumerator LoadGameOverScene(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         // Load the Game Over scene (ensure it's added to Build Settings)
         SceneManager.LoadScene("GameOver");
     }
+
 
     private void OnDrawGizmos()
     {

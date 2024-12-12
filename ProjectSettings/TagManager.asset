@@ -21,6 +21,7 @@ TagManager:
   - RightGrid
   - LeftGrid
   - Ground
+  - SpecialBlock
   layers:
   - Default
   - TransparentFX
@@ -29,7 +30,7 @@ TagManager:
   - Water
   - UI
   - Player
-  - block
+  - Block
   - FullPiece
   - Wall
   - 

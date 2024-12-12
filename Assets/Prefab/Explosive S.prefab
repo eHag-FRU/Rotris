@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 372255593752894880}
   m_Layer: 0
   m_Name: Block4
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 2817250681718135410}
   m_Layer: 0
   m_Name: Block3
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -330,7 +330,7 @@ GameObject:
   - component: {fileID: 5133639680936130949}
   m_Layer: 0
   m_Name: Block2
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -488,7 +488,7 @@ GameObject:
   - component: {fileID: 1949392285983778359}
   m_Layer: 0
   m_Name: Block1
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -768,8 +768,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d3e4bdc9418ee43a7516509a2e593d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jellyRotationRange: 0
-  jellyScaleRange: 0
+  RotationRange: 5
+  ScaleRange: 0.05
   lockDelay: 0.3
   rotationDuration: 0.4
   spring: 500
