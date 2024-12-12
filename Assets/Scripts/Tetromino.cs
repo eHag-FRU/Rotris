@@ -7,16 +7,16 @@ public class Tetromino : MonoBehaviour
     public Transform[] Blocks { get; private set; }
     public bool IsLocked { get; private set; } = false;
 
-    [Header("Jelly Drop Effect Settings")]
-    public float jellyRotationRange = 5f;
-    public float jellyScaleRange = 0.05f;
+    [Header(" Drop Effect Settings")]
+    public float RotationRange = 5f;
+    public float ScaleRange = 0.05f;
     public float lockDelay = 0.2f;
 
     [Header("Rotation Settings")]
     [Tooltip("Time in seconds to complete a rotation.")]
     public float rotationDuration = 0.3f;
 
-    [Header("Jelly Joint Settings")]
+    [Header(" Joint Settings")]
     [Tooltip("Spring constant for the joints.")]
     public float spring = 50f;
 
@@ -223,7 +223,7 @@ public class Tetromino : MonoBehaviour
             if (!collided)
             {
                 collided = true;
-                ApplyJellyDropEffect();
+                ApplyDropEffect();
                 StartLockDelayCountdown();
             }
         }
@@ -236,20 +236,20 @@ public class Tetromino : MonoBehaviour
         }
     }
 
-    private void ApplyJellyDropEffect()
+    private void ApplyDropEffect()
     {
-        Debug.Log("[Tetromino] Applying jelly drop effect.");
-        float randomRotation = Random.Range(-jellyRotationRange, jellyRotationRange);
-        StartCoroutine(RotateJellyDrop(randomRotation));
+        Debug.Log("[Tetromino] Applying  drop effect.");
+        float randomRotation = Random.Range(-RotationRange, RotationRange);
+        StartCoroutine(RotateDrop(randomRotation));
 
-        float scaleChange = 1.0f + Random.Range(-jellyScaleRange, jellyScaleRange);
-        StartCoroutine(ScaleJellyDrop(scaleChange));
+        float scaleChange = 1.0f + Random.Range(-ScaleRange, ScaleRange);
+        StartCoroutine(ScaleDrop(scaleChange));
     }
 
-    private IEnumerator RotateJellyDrop(float angle)
+    private IEnumerator RotateDrop(float angle)
     {
         float elapsed = 0f;
-        float duration = 0.2f; // Duration for jelly rotation effect
+        float duration = 0.2f; // Duration for  rotation effect
         float startRotation = rb.rotation;
         float endRotation = startRotation + angle;
 
@@ -264,7 +264,7 @@ public class Tetromino : MonoBehaviour
         rb.MoveRotation(endRotation);
     }
 
-    private IEnumerator ScaleJellyDrop(float scaleChange)
+    private IEnumerator ScaleDrop(float scaleChange)
     {
         Vector3 originalScale = transform.localScale;
         Vector3 targetScale = originalScale * scaleChange;
@@ -329,14 +329,14 @@ public class Tetromino : MonoBehaviour
 
         Destroy(gameObject);
 
-        JellyTetris jt = FindObjectOfType<JellyTetris>();
+        Tetris jt = FindObjectOfType<Tetris>();
         if (jt != null)
         {
             jt.LockTetromino(this);
         }
         else
         {
-            Debug.LogError("[Tetromino] No JellyTetris found, cannot lock.");
+            Debug.LogError("[Tetromino] No Tetris found, cannot lock.");
         }
     }
 }

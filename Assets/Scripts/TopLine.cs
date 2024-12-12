@@ -1,4 +1,3 @@
-// TopLine.cs
 using UnityEngine;
 
 public class TopLine : MonoBehaviour
@@ -6,16 +5,16 @@ public class TopLine : MonoBehaviour
     [Tooltip("The tag of the blocks that can trigger game over.")]
     public string blockTag = "Block";
 
-    // Reference to JellyTetris for direct communication
-    private JellyTetris jellyTetris;
+    // Reference to Tetris for direct communication
+    private Tetris Tetris;
 
     private void Start()
     {
-        // Find the JellyTetris instance in the scene
-        jellyTetris = FindObjectOfType<JellyTetris>();
-        if (jellyTetris == null)
+        // Find the Tetris instance in the scene
+        Tetris = FindObjectOfType<Tetris>();
+        if (Tetris == null)
         {
-            Debug.LogError("[TopLine] No JellyTetris instance found in the scene!");
+            Debug.LogError("[TopLine] No Tetris instance found in the scene!");
         }
     }
 
@@ -31,13 +30,13 @@ public class TopLine : MonoBehaviour
                 {
                     Debug.LogError("[TopLine] Block has reached the Top Line. Game Over!");
 
-                    if (jellyTetris != null)
+                    if (Tetris != null)
                     {
-                        jellyTetris.TriggerGameOver();
+                        Tetris.TriggerGameOver();
                     }
                     else
                     {
-                        Debug.LogError("[TopLine] JellyTetris instance not found. Cannot trigger Game Over.");
+                        Debug.LogError("[TopLine] Tetris instance not found. Cannot trigger Game Over.");
                     }
                 }
             }

@@ -10,6 +10,6 @@ public class ScoreManager : MonoBehaviour
     private void Update()
     {
         // Update the score text using TextMeshPro
-        currentScoreText.text = "Score: " + JellyTetris.Score;
+        currentScoreText.text = "Score: " + Tetris.Score;
     }
 }

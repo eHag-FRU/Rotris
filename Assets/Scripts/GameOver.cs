@@ -1,4 +1,5 @@
-// GameOverManager.cs
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro; // Import TextMeshPro namespace
@@ -15,15 +16,5 @@ public class GameOverManager : MonoBehaviour
         {
             gameOverText.text = "Game Over!"; // Optional customization
         }
-    }
-
-    public void RestartGame()
-    {
-        SceneManager.LoadScene("MainGameScene");
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
     }
 }
