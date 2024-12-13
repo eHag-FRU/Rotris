@@ -4,18 +4,24 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - GamePiece
   - Default
-  - TransparentFX
-  - Ignore Raycast
-  - Water
   - UI
-  - TestPiece
   - Piece
   - Boarder
   - Backboard_Piece
   - BoardBottom
   - Piece_Part
+  - OldPiece
+  - NewPiece
+  - TopGrid
+  - BottomGrid
+  - Grid
+  - Block
+  - ClearZone
+  - RightGrid
+  - LeftGrid
+  - Ground
+  - SpecialBlock
   layers:
   - Default
   - TransparentFX
@@ -24,9 +30,9 @@ TagManager:
   - Water
   - UI
   - Player
-  - 
-  - 
-  - 
+  - Block
+  - FullPiece
+  - Wall
   - 
   - 
   - 
