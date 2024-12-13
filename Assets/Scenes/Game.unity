@@ -122,11 +122,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!4 &9800397 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-  m_PrefabInstance: {fileID: 3162372220098394223}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &81793293
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,11 +538,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1592526720}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -540, y: -19.999939}
-  m_SizeDelta: {x: 123.3599, y: 50}
-  m_Pivot: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -105.9, y: -19.999939}
+  m_SizeDelta: {x: 494.4834, y: -430}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &695473214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -875,7 +870,6 @@ Transform:
   m_Children:
   - {fileID: 177370232}
   - {fileID: 1919607690}
-  - {fileID: 9800397}
   - {fileID: 279259590}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1335,7 +1329,7 @@ MonoBehaviour:
   - {fileID: 2126452334776686221, guid: c1274f494809c63419bfafc0344aa8d4, type: 3}
   - {fileID: 2126452334776686221, guid: 528f61484f9fbea4c8c582fb5321bab0, type: 3}
   spawnPoint: {fileID: 1135819044}
-  gravityScale: 0.3
+  gravityScale: 1
   blockPhysicsMaterial: {fileID: 0}
   totalRows: 20
   rowHeight: 1.19
@@ -1346,12 +1340,11 @@ MonoBehaviour:
   rowWidth: 10
   settleDelay: 1
   glowDuration: 0.5
-  glowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  glowColor: {r: 1, g: 0.9830491, b: 0, a: 1}
   failLine: {fileID: 2028648773}
-  failineStart: 10
   failLineCollider: {fileID: 2028648774}
-  failLineMoveDownAmount: 1
-  failLineMoveUpAmount: 1.5
+  LineMovemovementDown: 1
+  LineMovemovementUp: 1
 --- !u!1 &2028648771
 GameObject:
   m_ObjectHideFlags: 0
@@ -1496,91 +1489,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockTag: Block
---- !u!1001 &3162372220098394223
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1231434197}
-    m_Modifications:
-    - target: {fileID: 1454443375042638081, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_Name
-      value: AudioMaster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729639082449436347, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: maxPitch
-      value: 1.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: menuMusic
-      value: 
-      objectReference: {fileID: 8300000, guid: 39597825450d3bf45ab1b8d55d75b7a8, type: 3}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: gameOverMusic
-      value: 
-      objectReference: {fileID: 8300000, guid: cd3f36d2a44c3e14b9e23233dd079810, type: 3}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: mainGameMusic.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: mainGameMusic.Array.data[0]
-      value: 
-      objectReference: {fileID: 8300000, guid: 39597825450d3bf45ab1b8d55d75b7a8, type: 3}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: mainGameMusic.Array.data[1]
-      value: 
-      objectReference: {fileID: 8300000, guid: faa4c45639be1314cbf0d128f8848428, type: 3}
-    - target: {fileID: 3891512708352544712, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
-      propertyPath: mainGameMusic.Array.data[2]
-      value: 
-      objectReference: {fileID: 8300000, guid: 2587bf53458caa346a8dee2ffb90f651, type: 3}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 754c337212b9a414c8003b4b8e589310, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -143,10 +143,10 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 500
+  m_Mass: 200
   m_LinearDrag: 5
   m_AngularDrag: 5
-  m_GravityScale: 800
+  m_GravityScale: 600
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -301,10 +301,10 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 500
+  m_Mass: 200
   m_LinearDrag: 5
   m_AngularDrag: 5
-  m_GravityScale: 800
+  m_GravityScale: 600
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -459,10 +459,10 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 500
+  m_Mass: 200
   m_LinearDrag: 5
   m_AngularDrag: 5
-  m_GravityScale: 800
+  m_GravityScale: 600
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -617,10 +617,10 @@ Rigidbody2D:
   m_Simulated: 0
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 500
+  m_Mass: 200
   m_LinearDrag: 5
   m_AngularDrag: 5
-  m_GravityScale: 800
+  m_GravityScale: 600
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -741,10 +741,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 500
+  m_Mass: 300
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 500
+  m_GravityScale: 600
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2

@@ -1,10 +1,10 @@
 using UnityEngine;
-using TMPro; // Import TextMeshPro namespace
+using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
     [Header("UI Elements")]
-    public TMP_Text currentScoreText; // Assign in Inspector
+    public TMP_Text currentScoreText;
 
     private void Update()
     {

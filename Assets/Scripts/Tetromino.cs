@@ -1,7 +1,10 @@
-// Tetromino.cs
 using UnityEngine;
 using System.Collections;
 
+// Resources:
+// https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MonoBehaviour.StartCoroutine.html
+// https://stackoverflow.com/questions/70538568/unity-startcoroutine
+// https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnDrawGizmos.html
 public class Tetromino : MonoBehaviour
 {
     public Transform[] Blocks { get; private set; }
@@ -13,29 +16,25 @@ public class Tetromino : MonoBehaviour
     public float lockDelay = 0.2f;
 
     [Header("Rotation Settings")]
-    [Tooltip("Time in seconds to complete a rotation.")]
     public float rotationDuration = 0.3f;
 
     [Header(" Joint Settings")]
-    [Tooltip("Spring constant for the joints.")]
     public float spring = 50f;
 
-    [Tooltip("Damping ratio for the joints.")]
     public float damping = 5f;
 
-    [Tooltip("Maximum distance allowed between connected blocks.")]
     public float distance = 0.5f;
 
     private BoxCollider2D[] blockColliders;
     private bool collided = false;
     private bool lockTimerStarted = false;
-    private bool isRotating = false; // Flag to prevent multiple rotations
+    private bool isRotating = false; // prevent multiple rotations
 
     private Rigidbody2D rb;
 
     private void Awake()
     {
-        // Initialize Blocks array excluding the parent transform
+        // Initialize Blocks, major step in using the nested blocks
         Transform[] allChildren = GetComponentsInChildren<Transform>();
         int blockCount = 0;
         foreach (Transform child in allChildren)
@@ -54,8 +53,6 @@ public class Tetromino : MonoBehaviour
                 index++;
             }
         }
-
-        // Initialize blockColliders array
         blockColliders = new BoxCollider2D[Blocks.Length];
         for (int i = 0; i < Blocks.Length; i++)
         {
@@ -64,22 +61,20 @@ public class Tetromino : MonoBehaviour
             {
                 blockColliders[i] = col;
             }
-            else
+            else // Safety Measure Block
             {
-                // Optionally, add a BoxCollider2D if missing
                 col = Blocks[i].gameObject.AddComponent<BoxCollider2D>();
                 blockColliders[i] = col;
             }
         }
 
-        // Initialize Rigidbody2D
         rb = GetComponent<Rigidbody2D>();
         if (rb == null)
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
         }
 
-        // Initialize joints between blocks
+        // joints between blocks
         InitializeJoints();
     }
 
@@ -93,13 +88,11 @@ public class Tetromino : MonoBehaviour
 
         if (blockPhysicsMaterial != null)
             rb.sharedMaterial = blockPhysicsMaterial;
-
-        Debug.Log("[Tetromino] Initialized with properties.");
     }
 
     private void InitializeJoints()
     {
-        // Ensure all blocks have Rigidbody2D components
+        // Ensure all blocks start with rigidb
         foreach (var block in Blocks)
         {
             Rigidbody2D blockRb = block.GetComponent<Rigidbody2D>();
@@ -113,13 +106,13 @@ public class Tetromino : MonoBehaviour
             }
         }
 
-        // Connect each block to its immediate neighbors
+        // Connect each block
         for (int i = 0; i < Blocks.Length; i++)
         {
             for (int j = i + 1; j < Blocks.Length; j++)
             {
                 float currentDistance = Vector3.Distance(Blocks[i].localPosition, Blocks[j].localPosition);
-                if (currentDistance <= 1.0f) // Adjust this threshold based on block arrangement
+                if (currentDistance <= 1.0f) 
                 {
                     SpringJoint2D joint = Blocks[i].gameObject.AddComponent<SpringJoint2D>();
                     Rigidbody2D connectedRb = Blocks[j].GetComponent<Rigidbody2D>();
@@ -130,7 +123,8 @@ public class Tetromino : MonoBehaviour
                     joint.frequency = spring;
                     joint.dampingRatio = damping;
 
-                    // Optionally, adjust joint break force or other properties
+                    // Helpful Unity Link: https://docs.unity3d.com/Manual/class-SpringJoint.html
+                    // This allows joints to be broken
                      joint.breakForce = 5000;
                      joint.breakTorque = 1000;
                 }
@@ -141,16 +135,12 @@ public class Tetromino : MonoBehaviour
     public void TryMove(Vector3 direction)
     {
         if (IsLocked) return;
-
-        // Apply movement using Rigidbody2D for physics-based movement
         rb.MovePosition(rb.position + (Vector2)direction);
     }
 
     public void TryRotate(float angle)
     {
         if (IsLocked || isRotating) return;
-
-        // Start a coroutine to rotate smoothly
         StartCoroutine(RotateOverTime(angle));
     }
 
@@ -169,10 +159,8 @@ public class Tetromino : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-
         rb.MoveRotation(endRotation);
 
-        // Check if the new rotation is valid
         if (!IsValidPosition())
         {
             // If invalid, revert rotation
@@ -187,15 +175,10 @@ public class Tetromino : MonoBehaviour
         foreach (Transform block in Blocks)
         {
             Vector3 pos = block.position;
-
-            // Check if block is within valid boundaries
             if (pos.x < -4f || pos.x > 4f || pos.y < -9f || pos.y > 9f)
             {
                 return false;
             }
-
-            // Additional collision checks can be implemented here
-            // For example, check if the block overlaps with existing blocks
         }
         return true;
     }
@@ -216,7 +199,6 @@ public class Tetromino : MonoBehaviour
         {
             if (collision.gameObject.CompareTag("TopGrid"))
             {
-                Debug.LogError("GameOver: Touched the top grid boundary!");
                 return;
             }
 
@@ -228,17 +210,15 @@ public class Tetromino : MonoBehaviour
             }
         }
 
-        // New Logic: Lock block if it touches another block
         if (collision.gameObject.CompareTag("Block"))
         {
-            Debug.Log("[Tetromino] Touched another block, locking.");
+            Debug.Log("Touched another block, locking.");
             LockPiece();
         }
     }
 
     private void ApplyDropEffect()
     {
-        Debug.Log("[Tetromino] Applying  drop effect.");
         float randomRotation = Random.Range(-RotationRange, RotationRange);
         StartCoroutine(RotateDrop(randomRotation));
 
@@ -280,7 +260,6 @@ public class Tetromino : MonoBehaviour
 
         transform.localScale = targetScale;
 
-        // Revert to original scale
         elapsed = 0f;
         while (elapsed < duration)
         {
@@ -307,7 +286,6 @@ public class Tetromino : MonoBehaviour
 
     private void LockPiece()
     {
-        Debug.Log("[Tetromino] Locking piece after lock delay.");
         IsLocked = true;
 
         foreach (Transform block in Blocks)
@@ -333,10 +311,6 @@ public class Tetromino : MonoBehaviour
         if (jt != null)
         {
             jt.LockTetromino(this);
-        }
-        else
-        {
-            Debug.LogError("[Tetromino] No Tetris found, cannot lock.");
         }
     }
 }

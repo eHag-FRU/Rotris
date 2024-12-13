@@ -49,39 +49,36 @@ public class ButtonManager : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
-        // Optionally, reset the score
+        // Reset Score 
         PlayerPrefs.SetInt("FinalScore", 0);
         PlayerPrefs.Save();
 
-        // Play menu music
+        // Play music
         if (MusicManager.Instance != null)
         {
             MusicManager.Instance.PlayMenuMusic();
         }
 
-        // Load the Main Menu scene
+        // Main Menu Scene
         SceneManager.LoadScene("TitleScreen");
     }
 
     public void RestartGame()
     {
-        // Optionally, reset the score
+        // Reset Score
         PlayerPrefs.SetInt("FinalScore", 0);
         PlayerPrefs.Save();
-
-        // Play game music
+        // Play music
         if (MusicManager.Instance != null)
         {
             MusicManager.Instance.PlayGameMusic();
         }
 
-        // Load the Game scene
+        // Game scene
         SceneManager.LoadScene("Game");
     }
 
-
-
-
+        // Quit
     public void QuitGame()
     {
         Application.Quit();

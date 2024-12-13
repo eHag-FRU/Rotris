@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement; // Required for scene management
+using UnityEngine.SceneManagement; 
 
 public class Tetris : MonoBehaviour
 {
@@ -13,64 +13,47 @@ public class Tetris : MonoBehaviour
     public PhysicsMaterial2D blockPhysicsMaterial;
 
     [Header("Row Settings")]
-    [Tooltip("Total number of rows in the playable area.")]
-    public int totalRows = 20; // e.g., 20 for the grid height
-    [Tooltip("Total vertical space allocated to each row.")]
+    public int totalRows = 20;
     public float rowHeight = 0.5f;
-    [Tooltip("Height used for actual block overlap checks. Should be smaller than rowHeight to create a gap.")]
     public float rowCheckHeight = 0.4f;
-    [Tooltip("Number of blocks required per row to clear it.")]
     public int blocksPerRow = 10;
 
     [Header("Grid Bounds")]
-    [Tooltip("Bottom-most Y position of the grid.")]
     public float startY = -9f;
-    [Tooltip("Top-most Y position of the grid (for reference).")]
     public float endY = 9f;
-    [Tooltip("Horizontal width of each row for collision checking.")]
     public float rowWidth = 10f;
 
     [Header("Timing")]
-    [Tooltip("Delay before checking and clearing rows after a tetromino locks in place.")]
     public float settleDelay = 1f;
 
     [Header("Glow Settings")]
-    [Tooltip("Duration for which blocks glow before being cleared.")]
     public float glowDuration = 0.5f;
-
-    [Tooltip("Color to apply to blocks when they glow.")]
     public Color glowColor = Color.yellow;
 
-    [Header("Fail Line Settings")]
-    [Tooltip("Transform of the Fail Line.")]
+    [Header("Line Settings")]
     public Transform failLine;
 
-    [Tooltip("Collider component of the Fail Line.")]
     public Collider2D failLineCollider;
 
-    [Header("Fail Line Movement Settings")]
-    [Tooltip("Amount the Fail Line moves down when moving down.")]
+    [Header("Line Movement: Down")]
     [SerializeField]
-    private float failLineMoveDownAmount = 1.0f;
+    private float LineMovemovementDown = 1f;                // Adjustable
 
-    [Tooltip("Amount the Fail Line moves up when moving up.")]
+    [Header("Line Movement: Up")]
     [SerializeField]
-    private float failLineMoveUpAmount = 1.5f;
-
-    private int failLineRowIndex = 0; 
-    private Collider2D[][] rowBlockArrays;
+    private float LineMovemovementUp = 1f;                  // Adjustable (Could change to 2 for easy play)
+    private Collider2D[][] rowBlockArrays;                    // Each row contains an array of colliders, Line up 10 = clear
     private bool isGameOver = false;
     private bool isCheckingRows = false;
 
-    // Scoring
+    // Scoring - I am not going crazy on this part. Clear = 100
     public static int Score { get; private set; } = 0;
 
     private void Start()
     {
-        Debug.Log("[Tetris] Initializing...");
         InitializeRows();
         SpawnTetromino();
-        InitializeFailLine(); // Initialize Fail Line
+        InitializeFailLine(); 
     }
 
     private void InitializeRows()
@@ -84,12 +67,12 @@ public class Tetris : MonoBehaviour
 
     public void AddBlockToRow(Collider2D blockCollider)
     {
-        // Determine which row this block belongs to.
+        // Determine which row a block belongs to.
         int rowIndex = Mathf.FloorToInt((blockCollider.transform.position.y - startY) / rowHeight);
 
         if (rowIndex >= 0 && rowIndex < totalRows)
         {
-            // Create a new array with one additional slot
+            // Create array
             Collider2D[] newRow = new Collider2D[rowBlockArrays[rowIndex].Length + 1];
             for (int i = 0; i < rowBlockArrays[rowIndex].Length; i++)
             {
@@ -98,32 +81,20 @@ public class Tetris : MonoBehaviour
             newRow[newRow.Length - 1] = blockCollider;
             rowBlockArrays[rowIndex] = newRow;
 
-            // If the row is immediately full, we won't clear it right away.
-            // It will be cleared during the scheduled settle check.
+            // If row is full wait for check
         }
     }
 
     private IEnumerator ClearRowCoroutine(Collider2D[] rowBlocks)
     {
-        // Apply glow to all blocks in the row
+        // Apply glow - Satisfying effects. Fun fact, I put a similar version in to debug at first
+          // Apply glow to all blocks in the row
         foreach (var block in rowBlocks)
         {
             if (block != null && block.gameObject.CompareTag("Block"))
             {
                 SpriteRenderer sr = block.GetComponent<SpriteRenderer>();
-                if (sr != null && sr.material.HasProperty("_EmissionColor"))
-                {
-                    sr.material.EnableKeyword("_EMISSION");
-                    sr.material.SetColor("_EmissionColor", glowColor);
-                }
-                else if (sr != null)
-                {
-                    sr.color = glowColor; // Fallback if emission is not available
-                }
-                else
-                {
-                    Debug.LogWarning("Block missing SpriteRenderer for glow.");
-                }
+                sr.color = glowColor;
             }
         }
 
@@ -166,61 +137,33 @@ public class Tetris : MonoBehaviour
                 return;
             }
         }
-
-        // Initialize failLineRowIndex based on its starting position
-        failLineRowIndex = Mathf.FloorToInt((failLine.position.y - startY) / rowHeight);
-        Debug.Log($"[Tetris] Initialized Fail Line at row index: {failLineRowIndex}");
     }
 
     private void MoveFailLineUp()
     {
-        if (failLine == null) return;
-
-        failLineRowIndex = Mathf.Clamp(failLineRowIndex + 1, 0, totalRows);
         Vector3 newPosition = new Vector3(
             failLine.position.x,
-            failLine.position.y + failLineMoveUpAmount, // Increased upward movement
+            failLine.position.y + LineMovemovementUp, // Up
             failLine.position.z
         );
         failLine.position = newPosition;
-        Debug.Log($"[Tetris] Moved Fail Line up to row index: {failLineRowIndex}");
     }
 
     private void MoveFailLineDown()
     {
-
-        failLineRowIndex = Mathf.Clamp(failLineRowIndex - 1, 0, totalRows);
         Vector3 newPosition = new Vector3(
             failLine.position.x,
-            failLine.position.y - failLineMoveDownAmount, // Reduced downward movement
+            failLine.position.y - LineMovemovementDown, //Down
             failLine.position.z
         );
         failLine.position = newPosition;
-        Debug.Log($"[Tetris] Moved Fail Line down by {failLineMoveDownAmount} to row index: {failLineRowIndex}");
 
-        // Adjust music pitch when fail line moves down
-        MusicChangeFailLine();
     }
-
-    private void MusicChangeFailLine()
-    {
-        if (MusicManager.Instance != null)
-        {
-            MusicManager.Instance.IncreasePitch(0.01f); // Increase pitch by 0.0
-        }
-        else
-        {
-            Debug.LogError("[Tetris] MusicManager instance not found!");
-        }
-    }
-
 
     private IEnumerator SettleAndClearRows()
     {
         isCheckingRows = true;
-
-        // Wait for 1 second before checking lines
-        yield return new WaitForSeconds(1f); // 1-second delay before line checking
+        yield return new WaitForSeconds(settleDelay);
 
         bool anyRowCleared = false;
 
@@ -258,13 +201,16 @@ public class Tetris : MonoBehaviour
                 rowBlocks[i] = rowBlocksTemp[i];
             }
 
+            Debug.Log($"[Tetris] Row {rowIndex} at {rowY} contains {rowBlocks.Length} blocks with tag 'Block'.");
+
             // Clear the row if the block count meets or exceeds the threshold
             if (rowBlocks.Length >= blocksPerRow)
             {
+                Debug.Log($"[Tetris] Clearing row at height: {rowY}");
                 yield return StartCoroutine(ClearRowCoroutine(rowBlocks));
                 anyRowCleared = true;
                 MoveFailLineUp(); // Move Fail Line up when a row is cleared
-                                  // After clearing, blocks above will settle due to gravity
+                // After clearing, blocks above will settle due to gravity
             }
         }
 
@@ -274,19 +220,14 @@ public class Tetris : MonoBehaviour
             MoveFailLineDown(); // Move Fail Line down if no rows were cleared
         }
 
-        // Delay spawning the new Tetromino by 1 second after clearing lines
-        yield return new WaitForSeconds(1f); // 1-second delay before spawning
-
-        // Spawn the new Tetromino
+        // If the game isn't over, spawn a new Tetromino
         if (!isGameOver)
-        {
             SpawnTetromino();
-        }
 
         isCheckingRows = false;
     }
 
-private void EnableSimulationAboveRow(float clearedRowY)
+    private void EnableSimulationAboveRow(float clearedRowY)
     {
         Rigidbody2D[] allRigidbodies = FindObjectsOfType<Rigidbody2D>();
         foreach (Rigidbody2D rb in allRigidbodies)
@@ -349,23 +290,20 @@ private void EnableSimulationAboveRow(float clearedRowY)
     {
         if (tetrominoPrefabs == null || tetrominoPrefabs.Length == 0)
         {
-            Debug.LogError("[Tetris] No Tetromino prefabs assigned!");
             return;
         }
-
         int index = Random.Range(0, tetrominoPrefabs.Length);
-        Debug.Log($"[Tetris] Selected Tetromino prefab index: {index}");
 
         Vector3 spawnPosition = spawnPoint.position;
         spawnPosition.x = Mathf.Clamp(spawnPosition.x, -4f, 4f);
-        spawnPosition.y = Mathf.Clamp(spawnPosition.y, 5f, 9f); // Adjusted y-clamp
+        spawnPosition.y = Mathf.Clamp(spawnPosition.y, 5f, 9f); 
 
         Debug.Log($"[Tetris] Spawning Tetromino at: {spawnPosition}");
 
         Tetromino newTetromino = Instantiate(tetrominoPrefabs[index], spawnPosition, Quaternion.identity);
         if (newTetromino != null)
         {
-            Debug.Log("[Tetris] Successfully instantiated Tetromino.");
+            Debug.Log("[Tetris] Successfully instantiated Tetromino."); // Ensuring that the piece actually spawns
             newTetromino.Initialize(gravityScale, blockPhysicsMaterial);
         }
         else
@@ -385,13 +323,14 @@ private void EnableSimulationAboveRow(float clearedRowY)
         {
             if (block.position.y > endY)
             {
+                Debug.LogError("GameOver: A block locked out of bounds!");
                 isGameOver = true;
                 HandleGameOver();
                 return;
             }
         }
 
-        // Instead of clearing rows immediately, we wait for the settle delay
+        // Instead of clearing rows immediately, wait to settle
         if (!isCheckingRows)
         {
             StartCoroutine(SettleAndClearRows());
@@ -409,56 +348,9 @@ private void EnableSimulationAboveRow(float clearedRowY)
 
     private void HandleGameOver()
     {
-        Debug.Log("[Tetris] Game Over!");
-
-        // Save the score before switching scenes
+        Debug.Log("[Tetris] Game Over!"); // Make sure that the game actually ended as it prepares to load a new scene and save the score.
         PlayerPrefs.SetInt("FinalScore", Score);
         PlayerPrefs.Save();
-
-
-
-
-        if (MusicManager.Instance != null)
-        {
-            MusicManager.Instance.PlayMenuMusic(); // 2-second fade duration
-        }
-        else
-        {
-            Debug.LogError("[Tetris] MusicManager instance not found!");
-        }
-        // Optionally, delay scene change to allow music transition
-        StartCoroutine(LoadGameOverScene(1f)); // Match fade duration
-    }
-
-    private IEnumerator LoadGameOverScene(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        // Load the Game Over scene (ensure it's added to Build Settings)
         SceneManager.LoadScene("GameOver");
-    }
-
-
-    private void OnDrawGizmos()
-    {
-        if (rowBlockArrays == null) return; // Exit if rows are not initialized
-
-        // Draw a gizmo for each row. Use rowCheckHeight to show the actual detection area.
-        for (int rowIndex = 0; rowIndex < totalRows; rowIndex++)
-        {
-            float rowY = startY + rowIndex * rowHeight;
-
-            // Determine color based on row fullness
-            if (rowBlockArrays[rowIndex] != null && rowBlockArrays[rowIndex].Length >= blocksPerRow)
-                Gizmos.color = Color.green;  // Full row
-            else
-                Gizmos.color = Color.gray;   // Incomplete row
-
-            // Draw the detection zone for this row as a smaller box than the full row height
-            // to reflect the gap.
-            Gizmos.DrawWireCube(
-                new Vector3(0, rowY, 0),
-                new Vector3(rowWidth, rowCheckHeight, 0)
-            );
-        }
     }
 }

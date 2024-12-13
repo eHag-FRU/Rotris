@@ -741,10 +741,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 100
+  m_Mass: 10
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 2
+  m_GravityScale: 20
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -768,8 +768,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d3e4bdc9418ee43a7516509a2e593d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jellyRotationRange: 0
-  jellyScaleRange: 0
+  RotationRange: 5
+  ScaleRange: 0.05
   lockDelay: 0.3
   rotationDuration: 0.02
   spring: 100
